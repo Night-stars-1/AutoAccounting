@@ -15,10 +15,14 @@
 
 package net.ankio.auto.utils.update
 
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import com.google.gson.Gson
 import com.hjq.toast.Toaster
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.ankio.auto.App
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
@@ -91,7 +95,9 @@ class UpdateUtils(private val showResult: Boolean = true) {
                 } else {
                     Logger.i("无需更新")
                     if (showResult) {
-                        Toaster.show(R.string.no_need_to_update)
+                        Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(App.appContext, R.string.no_need_to_update, Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                     null
@@ -100,7 +106,9 @@ class UpdateUtils(private val showResult: Boolean = true) {
                 Logger.e("检测更新出错：$it", it)
                 if (showResult)
                     {
-                        Toaster.show(R.string.check_update_error)
+                        Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(App.appContext, R.string.check_update_error, Toast.LENGTH_SHORT).show()
+                        }
                     }
             }.getOrNull()
         }

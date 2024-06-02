@@ -529,7 +529,7 @@ void WebSocketServer::log(const std::string &msg,int level ){
 
 std::string WebSocketServer::runJs(const std::string &js) {
     log("执行JS脚本",LOG_LEVEL_INFO);
-    log(js,LOG_LEVEL_DEBUG);
+    log("js内容: " + js,LOG_LEVEL_DEBUG);
     qjs::Runtime runtime;
     qjs::Context context(runtime);
     std::thread::id id = std::this_thread::get_id();
@@ -540,7 +540,7 @@ std::string WebSocketServer::runJs(const std::string &js) {
              import { print } from 'MyModule';
             globalThis.print = print;
         )xxx", "<import>", JS_EVAL_TYPE_MODULE);
-
+        log("前置变量载入完成", LOG_LEVEL_INFO);
         context.eval(js);
         std::lock_guard<std::mutex> lock(resultMapMutex);
         std::string data = resultMap[id];
