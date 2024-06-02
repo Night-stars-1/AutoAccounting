@@ -97,10 +97,6 @@ class MainActivity : BaseActivity() {
         onBackup()
         // 初始化底部导航栏
         onBottomViewInit()
-        // 检查规则更新
-        lifecycleScope.launch(Dispatchers.IO) {
-            checkUpdate()
-        }
 
         onViewCreated()
 
