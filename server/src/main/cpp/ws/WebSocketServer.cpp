@@ -490,15 +490,12 @@ void WebSocketServer::publishToken() {
             if (std::filesystem::exists(appPath)) {
                 std::string path = appPath + "/token.txt";
                 FILE *appFile = fopen(path.c_str(), "w");
-                // 检查文件指针是否为空
-                if (appFile == NULL) {
-                    printf("打开文件失败");
-                } else {
-                    printf("write token to %s\n", path.c_str());
-                    fprintf(appFile, "%s", token.c_str());
-                    fclose(appFile);
-                    chmod(path.c_str(), 0777);
-                }
+                printf("write token to %s\n", path.c_str());
+                fprintf(appFile, "%s", token.c_str());
+                fclose(appFile);
+                chmod(path.c_str(), 0777);
+            } else {
+                printf("file not exists %s\n", appPath.c_str());
             }
         }
         fclose(appsFile);
