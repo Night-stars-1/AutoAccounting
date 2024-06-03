@@ -46,7 +46,7 @@ class AssetsMap {
 
         suspend fun get(): List<AssetsMap> {
             val data = AppUtils.getService().sendMsg("asset/map/get", null)
-            return Gson().fromJson(Gson().toJson(data), Array<AssetsMap>::class.java).toList()
+            return runCatching{ Gson().fromJson(Gson().toJson(data), Array<AssetsMap>::class.java).toList() }.getOrDefault(emptyList())
         }
 
         suspend fun remove(id: Int)  {

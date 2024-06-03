@@ -363,7 +363,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                 printf("json parse error\n");
                 ret["data"] = "json parse error";
             }else{
-                float money = _json["money"].asFloat();
+                double money = _json["money"].asDouble();
+                _json["money"] = std::to_string(money);
                 int bill_type = _json["type"].asInt();
                 std::string shopName = replaceSubstring( _json["shopName"].asString(),"'","\"");
                 std::string shopItem = replaceSubstring( _json["shopItem"].asString(),"'","\"");
@@ -421,8 +422,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                             try {
                                 std::string cmd =
                                         R"(am start -a "net.ankio.auto.ACTION_SHOW_FLOATING_WINDOW" -d "autoaccounting://bill?data=)" +
-                                        base64::to_base64(_json.toStyledString()) + R"(" --ei ")" +
-                                        (pair.second ? "1" : "0") + //判断是否自动记录
+                                        base64::to_base64(_json.toStyledString()) +
                                         R"(" --ez "android.intent.extra.NO_ANIMATION" true -f 0x10000000)";
                                 //写日志
                                 log("执行命令" + cmd, LOG_LEVEL_INFO);

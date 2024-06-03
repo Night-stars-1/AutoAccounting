@@ -36,7 +36,7 @@ class BillInfo {
     /**
      * 金额 大于0
      */
-    var money: Int = 0
+    var money: Double = 0.0
 
     /**
      * 手续费
