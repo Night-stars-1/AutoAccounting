@@ -77,5 +77,11 @@ class AppData {
                 emptyList()
             }
         }
+
+        fun deleteAll() {
+            AppUtils.getScope().launch {
+                AppUtils.getService().sendMsg("data/delete/all", null)
+            }
+        }
     }
 }

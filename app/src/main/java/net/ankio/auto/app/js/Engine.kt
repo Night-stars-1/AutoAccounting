@@ -30,6 +30,7 @@ data class Data(
     val app: String,
     val data: String,
     val call: Int,
+    val id: Int
 )
 
 object Engine {
@@ -38,13 +39,14 @@ object Engine {
         app: String, // 来自哪个App或者手机号
         data: String, // 具体的数据
         call: Boolean = true,
+        id: Int = 0,
     ): BillInfo? =
         withContext(Dispatchers.IO) {
             AppTimeMonitor.startMonitoring("规则识别")
             val json =
                 AppUtils.getService().sendMsg(
                     "analyze",
-                    Data(dataType, app, data, if (call) 1 else 0),
+                    Data(dataType, app, data, if (call) 1 else 0, id),
                 ) as JsonObject
 
             val billInfo = runCatching { Gson().fromJson(json, BillInfo::class.java) }.getOrNull()

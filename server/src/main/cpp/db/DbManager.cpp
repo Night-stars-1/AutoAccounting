@@ -487,7 +487,7 @@ Json::Value DbManager::buildBill(sqlite3_stmt *stmt){
     return bill;
 }
 
-void DbManager::insertAppData(int id, const std::string &data, int type, const std::string &source,const std::string &rule,
+int DbManager::insertAppData(int id, const std::string &data, int type, const std::string &source,const std::string &rule,
                               int time, int match, int issue) {
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt ;
@@ -515,6 +515,11 @@ void DbManager::insertAppData(int id, const std::string &data, int type, const s
         fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
+    if (id == 0) {
+        id = static_cast<int>(sqlite3_last_insert_rowid(db));
+    }
+
+    return id;
 }
 
 Json::Value DbManager::getAppData(int limit) {
@@ -540,6 +545,17 @@ Json::Value DbManager::getAppData(int limit) {
     }
     sqlite3_finalize(stmt);
     return ret;
+}
+
+void DbManager::deleteAllAppData(){
+    char *zErrMsg = nullptr;
+    sqlite3_exec(db,
+                 "DELETE FROM appData;",
+                 nullptr, nullptr, &zErrMsg);
+    if (zErrMsg) {
+        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
 }
 
 void DbManager::insertAsset(int id, const std::string &name, int type, int sort, const std::string &icon,

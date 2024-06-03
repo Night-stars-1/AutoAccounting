@@ -181,7 +181,7 @@ abstract class BaseFragment : Fragment() {
                 while (errorReader.readLine().also { line = it } != null) {
                     withContext(Dispatchers.Main) {
                         // 更新 TextView 来显示命令输出
-                        textView.append("[ERROR] $line\n")
+                        textView.append(" [ERROR] $line\n")
                         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
                     }
                 }
@@ -189,9 +189,9 @@ abstract class BaseFragment : Fragment() {
                 val exitCode = process.waitFor()
                 withContext(Dispatchers.Main) {
                     if (exitCode == 0) {
-                        textView.append("[SUCCESS] 命令执行成功\n")
+                        textView.append(" [SUCCESS] 命令执行成功\n")
                     } else {
-                        textView.append("[FAILURE] 命令执行失败，退出代码: $exitCode\n")
+                        textView.append(" [FAILURE] 命令执行失败，退出代码: $exitCode\n")
                     }
                     scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
                 }

@@ -186,8 +186,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         } else if(message_type == "bill/list/child"){
             ret["data"]=DbManager::getInstance().getBillByGroupId(data["groupId"].asInt());
         }else if(message_type == "bill/list/parent"){
-        ret["data"]=DbManager::getInstance().getBillAllParents();
-    }
+            ret["data"]=DbManager::getInstance().getBillAllParents();
+        }
 
 
         else if(message_type == "data/put"){
@@ -202,6 +202,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             DbManager::getInstance().insertAppData(id, _data, _type, source,rule, time, match, issue);
         } else if(message_type == "data/get"){
             ret["data"]=DbManager::getInstance().getAppData(data["limit"].asInt());
+        } else if(message_type == "data/delete/all") {
+            DbManager::getInstance().deleteAllAppData();
         }
 
 
@@ -337,6 +339,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
 
         else if(message_type == "analyze"){
+            int id = data["id"].asInt();
             std::string _data = data["data"].asString();
             std::string app = data["app"].asString();
             int _type = data["type"].asInt();
@@ -344,7 +347,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             int time = std::time(nullptr);
             if (call == 1) {
                 // 先存data
-                DbManager::getInstance().insertAppData(0, _data, _type, app, "", time, 0, 0);
+                id = DbManager::getInstance().insertAppData(id, _data, _type, app, "", time, 0, 0);
             }
 
             //Json::Value rule = DbManager::getInstance().getRule(app, _type);
@@ -378,7 +381,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                 std::string channel = _json["channel"].asString();
 
                 //自动重新更新，不需要App调用更新
-                DbManager::getInstance().insertAppData(0, _data, _type, app, channel, time, 1, 0);
+                DbManager::getInstance().insertAppData(id, _data, _type, app, channel, time, 1, 0);
 
                 //分析分类内容
                 std::pair<bool, bool> pair = DbManager::getInstance().checkRule(app, _type,

@@ -44,8 +44,10 @@ import net.ankio.auto.ui.utils.MenuItem
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.CustomTabsHelper
 import net.ankio.auto.utils.Github
+import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
 import net.ankio.auto.utils.server.model.AppData
+import net.ankio.auto.utils.server.model.LogModel
 
 class DataFragment : BaseFragment() {
     private lateinit var binding: FragmentDataBinding
@@ -59,6 +61,16 @@ class DataFragment : BaseFragment() {
                 FilterDialog(requireActivity()) {
                     loadMoreData()
                 }.show(false)
+            },
+            MenuItem(R.string.item_clear, R.drawable.menu_icon_clear) {
+                runCatching {
+                    lifecycleScope.launch {
+                        AppData.deleteAll()
+                        loadMoreData()
+                    }
+                }.onFailure {
+                    Logger.e("清除失败", it)
+                }
             },
         )
 
@@ -84,7 +96,7 @@ class DataFragment : BaseFragment() {
                 },
                 onClickTest = { item ->
                     lifecycleScope.launch {
-                        val result = Engine.analyze(item.type, item.source, item.data, false)
+                        val result = Engine.analyze(item.type, item.source, item.data, false, item.id)
                         if (result == null) {
                             // 弹出悬浮窗
                             Toaster.show(R.string.no_match)
