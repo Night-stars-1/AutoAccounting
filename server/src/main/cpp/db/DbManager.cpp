@@ -520,7 +520,7 @@ void DbManager::insertAppData(int id, const std::string &data, int type, const s
 Json::Value DbManager::getAppData(int limit) {
     Json::Value ret;
     char *zErrMsg = nullptr;
-    sqlite3_stmt *stmt = getStmt("SELECT * FROM appData ORDER BY id DESC LIMIT ?;");
+    sqlite3_stmt *stmt = getStmt("SELECT id, data, type, source, time, match, issue, rule FROM appData ORDER BY id DESC LIMIT ?;");
     sqlite3_bind_int(stmt, 1, limit);
     int rc = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -532,6 +532,7 @@ Json::Value DbManager::getAppData(int limit) {
         appData["time"] = sqlite3_column_int(stmt, 4);
         appData["match"] = sqlite3_column_int(stmt, 5);
         appData["issue"] = sqlite3_column_int(stmt, 6);
+        appData["rule"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
         ret.append(appData);
     }
     if (rc != SQLITE_DONE) {

@@ -149,7 +149,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
-
+                android:tooltipText="@string/test_rule"
                 tools:ignore="RelativeOverlap" />
             <com.google.android.material.button.MaterialButton
 
@@ -160,6 +160,7 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="15dp"
                 android:layout_toStartOf="@+id/testRule"
+                android:tooltipText="@string/upload_data"
 
                 tools:ignore="RelativeOverlap" />
 

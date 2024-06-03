@@ -15,7 +15,9 @@
 
 package net.ankio.auto.ui.adapter
 
+import android.annotation.SuppressLint
 import android.net.Uri
+import android.view.Menu
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.elevation.SurfaceColors
@@ -66,6 +68,7 @@ class DataAdapter(
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindView(
         holder: BaseViewHolder,
         item: Any,
