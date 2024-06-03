@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <unistd.h>
+#include <execinfo.h>
 #include "WebSocketServer.h"
 #include "../jsoncpp/include/json/value.h"
 #include "../jsoncpp/include/json/reader.h"
@@ -12,9 +13,10 @@
 #include "../base64/include/base64.hpp"
 #include <random>
 #include <sys/stat.h>
-
+std::string WebSocketServer::version;
 WebSocketServer::WebSocketServer(int port) {
     initToken();
+    version = getVersion();
     struct ws_server wsServer{};
     wsServer.host = "0.0.0.0";
     wsServer.port = static_cast<uint16_t>(port);
@@ -23,7 +25,21 @@ WebSocketServer::WebSocketServer(int port) {
     wsServer.evs.onopen = &WebSocketServer::onOpen;
     wsServer.evs.onclose = &WebSocketServer::onClose;
     wsServer.evs.onmessage = &WebSocketServer::onMessage;
+
     ws_socket(&wsServer);
+}
+
+std::string WebSocketServer::getVersion() {
+    FILE *file = fopen("version.txt", "r");
+    if (file == nullptr) {
+        file = fopen("version.txt", "w");
+        fprintf(file, "%s", "1.0.0");
+        return "1.0.0";
+    } else {
+        char buf[1024];
+        fgets(buf, 1024, file);
+        return buf;
+    }
 }
 
 /**
@@ -33,8 +49,10 @@ WebSocketServer::WebSocketServer(int port) {
 void WebSocketServer::onOpen(ws_cli_conn_t *client) {
     Json::Value json;
     json["type"] = "auth";
+    json["version"] = version;
     ws_sendframe_txt(client, json.toStyledString().c_str());
 }
+
 
 /**
  * @brief This function is called whenever a connection is closed.
@@ -69,6 +87,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
         std::string message_id = json["id"].asString();
         std::string message_type = json["type"].asString();
+        std::string message_token = json["token"].asString();
 
         printf("message_type: %s\n", message_type.c_str());
 
@@ -92,7 +111,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             return;
         }
 
-        if (clients.find(client) == clients.end()) {
+        if (clients.find(client) == clients.end() && message_token != token) {
             printf("client not auth\n");
             ws_close_client(client);
             return;
@@ -331,16 +350,16 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             //Json::Value rule = DbManager::getInstance().getRule(app, _type);
             std::string rule = DbManager::getInstance().getSetting("server", "rule_js");
             //先执行分析账单内容
-            std::string billJs = "var window = {data:JSON.stringify(" + _data + ")};" + rule;
+            std::string billJs =
+                    "var window = {data:JSON.stringify(" + _data + "), type:" +
+                    std::to_string(_type) + ",app:'" + app + "'};" +
+                    rule;
 
             std::string result = runJs(billJs);
 
-            //获取当前时间戳
-
-
             Json::Value _json;
             Json::Reader _reader;
-            if (!_reader.parse((const char *) msg, _json)) {
+            if (!_reader.parse((const char *) result.c_str(), _json)) {
                 printf("json parse error\n");
                 ret["data"] = "json parse error";
             }else{
@@ -358,7 +377,6 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                 std::string channel = _json["channel"].asString();
 
                 //自动重新更新，不需要App调用更新
-
                 DbManager::getInstance().insertAppData(0, _data, _type, app, channel, time, 1, 0);
 
                 //分析分类内容
@@ -382,7 +400,6 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                             "var categoryInfo = getCategory(window.money,window.type,window.shopName,window.shopItem,window.time);" +
                             "if(categoryInfo !== null) { print(JSON.stringify(categoryInfo));  } else { " +
                             official_cate_js + " }";
-
 
                     std::string categoryResult = runJs(categoryJs);
                     Json::Value categoryJson;
@@ -503,9 +520,18 @@ void WebSocketServer::publishToken() {
 std::map<ws_cli_conn_t *, bool> WebSocketServer::clients{};
 std::string WebSocketServer::token;
 
+// 将 std::thread::id 转换为字符串
+std::string threadIdToString(const std::thread::id& id) {
+    std::ostringstream oss;
+    oss << id;
+    return oss.str();
+}
+
+
 void WebSocketServer::print(qjs::rest<std::string> args) {
+    log(args[0], LOG_LEVEL_DEBUG);
     std::lock_guard<std::mutex> lock(resultMapMutex);
-    resultMap[std::thread::id()] = args[0];
+    resultMap[std::this_thread::get_id()] = args[0];
 }
 
 void WebSocketServer::log(const std::string &msg,int level ){
@@ -524,7 +550,7 @@ void WebSocketServer::log(const std::string &msg,int level ){
 
 std::string WebSocketServer::runJs(const std::string &js) {
     log("执行JS脚本",LOG_LEVEL_INFO);
-    log(js,LOG_LEVEL_DEBUG);
+    log("脚本内容: " + js,LOG_LEVEL_DEBUG);
     qjs::Runtime runtime;
     qjs::Context context(runtime);
     std::thread::id id = std::this_thread::get_id();

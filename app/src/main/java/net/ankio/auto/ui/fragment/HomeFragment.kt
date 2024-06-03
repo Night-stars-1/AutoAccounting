@@ -20,6 +20,7 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -208,7 +209,7 @@ class HomeFragment : BaseFragment() {
         }
         EventBus.register(UpdateSuccessEvent::class.java, onUpdateRule)
         binding.checkRuleUpdate.setOnClickListener {
-            Toaster.show(R.string.check_update)
+            Toast.makeText(requireContext(), R.string.check_update, Toast.LENGTH_SHORT).show()
             lifecycleScope.launch {
                 checkUpdate(true)
             }

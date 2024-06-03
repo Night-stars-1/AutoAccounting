@@ -15,12 +15,19 @@
 
 package net.ankio.auto.app.js
 
-import com.google.gson.JsonObject
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ankio.auto.utils.AppTimeMonitor
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.server.model.BillInfo
+
+data class Data(
+    val type: Int,
+    val app: String,
+    val data: String,
+    val call: Int,
+)
 
 object Engine {
     suspend fun analyze(
@@ -31,16 +38,11 @@ object Engine {
     ): BillInfo? =
         withContext(Dispatchers.IO) {
             AppTimeMonitor.startMonitoring("规则识别")
-
+            val gson = Gson()
             val json =
                 AppUtils.getService().sendMsg(
                     "analyze",
-                    JsonObject().apply {
-                        addProperty("type", dataType)
-                        addProperty("app", app)
-                        addProperty("data", data)
-                        addProperty("call", if (call) 1 else 0)
-                    },
+                    gson.toJson(Data(dataType, app, data, if (call) 1 else 0)),
                 )
 
             val billInfo = runCatching { json as BillInfo }.getOrNull()
