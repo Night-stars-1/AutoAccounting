@@ -47,9 +47,9 @@ object Engine {
                 AppUtils.getService().sendMsg(
                     "analyze",
                     Data(dataType, app, data, if (call) 1 else 0, id),
-                ) as JsonObject
+                )
 
-            val billInfo = runCatching { Gson().fromJson(json, BillInfo::class.java) }.getOrNull()
+            val billInfo = runCatching { Gson().fromJson(json as JsonObject, BillInfo::class.java) }.getOrNull()
 
             AppTimeMonitor.stopMonitoring("规则识别")
             billInfo

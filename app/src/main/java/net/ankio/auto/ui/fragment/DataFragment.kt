@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -98,8 +99,8 @@ class DataFragment : BaseFragment() {
                     lifecycleScope.launch {
                         val result = Engine.analyze(item.type, item.source, item.data, false, item.id)
                         if (result == null) {
-                            // 弹出悬浮窗
-                            Toaster.show(R.string.no_match)
+                            // 弹出吐司
+                            Toast.makeText(requireContext(), R.string.no_match, Toast.LENGTH_SHORT).show()
                         } else {
                             val tpl = SpUtils.getString("setting_bill_remark", "【商户名称】 - 【商品名称】")
                             result.remark = BillUtils.getRemark(result, tpl)
