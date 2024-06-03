@@ -20,7 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.CountDownTimer
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -165,80 +167,83 @@ class FloatingWindowService : Service(), CoroutineScope {
     }
 
     private fun processBillInfo() {
-        showWindow = true
-        if (timeCount == 0) {
-            callBillInfoEditor("setting_float_on_badge_timeout")
-            // 显示编辑悬浮窗
-            return
-        }
-
-        // 使用 ViewBinding 初始化悬浮窗视图
-        val binding = FloatTipBinding.inflate(LayoutInflater.from(themedContext))
-        binding.root.visibility = View.INVISIBLE
-        binding.money.text = billInfo!!.money.toString()
-
-        val colorRes = BillUtils.getColor(billInfo!!.type.toInt())
-        val color = ContextCompat.getColor(themedContext, colorRes)
-        binding.money.setTextColor(color)
-        binding.time.text = String.format("%ss", timeCount.toString())
-
-        val countDownTimer =
-            object : CountDownTimer(timeCount * 1000L, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    binding.time.text = String.format("%ss", (millisUntilFinished / 1000).toString())
-                }
-
-                override fun onFinish() {
-                    // 取消倒计时
-                    removeTips(binding)
-                    callBillInfoEditor("setting_float_on_badge_timeout")
-                }
-            }
-        countDownTimer.start()
-
-        binding.root.setOnClickListener {
-            countDownTimer.cancel() // 定时器停止
-            removeTips(binding)
-            callBillInfoEditor("setting_float_on_badge_click")
-        }
-
-        binding.root.setOnLongClickListener {
-            countDownTimer.cancel() // 定时器停止
-            removeTips(binding)
-            // 不记录
-            callBillInfoEditor("setting_float_on_badge_long_click")
-            true
-        }
-
-        // 设置 WindowManager.LayoutParams
-        val params =
-            WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT,
-            ).apply {
-                x = 0 // 居中
-                y = -120 // 居中偏上
-                gravity = Gravity.CENTER or Gravity.END
+        Handler(Looper.getMainLooper()).post {
+            showWindow = true
+            if (timeCount == 0) {
+                callBillInfoEditor("setting_float_on_badge_timeout")
+                // 显示编辑悬浮窗
+                return@post
             }
 
-        // 将视图添加到 WindowManager
-        windowManager.addView(binding.root, params)
-        binding.root.post {
-            val widthInner =
-                binding.logo.width + binding.money.width + binding.time.width + 150 // logo间隔
-            // 更新悬浮窗的宽度和高度
-            params.width = widthInner // 新宽度，单位：像素
-            params.height = binding.logo.height + 60 // 新高度，单位：像素
-            // 应用新的布局参数
-            windowManager.updateViewLayout(binding.root, params)
-            binding.root.visibility = View.VISIBLE
-        }
+            // 使用 ViewBinding 初始化悬浮窗视图
+            val binding = FloatTipBinding.inflate(LayoutInflater.from(themedContext))
+            binding.root.visibility = View.INVISIBLE
+            binding.money.text = billInfo!!.money.toString()
 
-        // 将绑定添加到列表中以便管理
-        floatingViews.add(binding)
+            val colorRes = BillUtils.getColor(billInfo!!.type.toInt())
+            val color = ContextCompat.getColor(themedContext, colorRes)
+            binding.money.setTextColor(color)
+            binding.time.text = String.format("%ss", timeCount.toString())
+
+            val countDownTimer =
+                object : CountDownTimer(timeCount * 1000L, 1000) {
+                    override fun onTick(millisUntilFinished: Long) {
+                        binding.time.text =
+                            String.format("%ss", (millisUntilFinished / 1000).toString())
+                    }
+
+                    override fun onFinish() {
+                        // 取消倒计时
+                        removeTips(binding)
+                        callBillInfoEditor("setting_float_on_badge_timeout")
+                    }
+                }
+            countDownTimer.start()
+
+            binding.root.setOnClickListener {
+                countDownTimer.cancel() // 定时器停止
+                removeTips(binding)
+                callBillInfoEditor("setting_float_on_badge_click")
+            }
+
+            binding.root.setOnLongClickListener {
+                countDownTimer.cancel() // 定时器停止
+                removeTips(binding)
+                // 不记录
+                callBillInfoEditor("setting_float_on_badge_long_click")
+                true
+            }
+
+            // 设置 WindowManager.LayoutParams
+            val params =
+                WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT,
+                ).apply {
+                    x = 0 // 居中
+                    y = -120 // 居中偏上
+                    gravity = Gravity.CENTER or Gravity.END
+                }
+
+            // 将视图添加到 WindowManager
+            windowManager.addView(binding.root, params)
+            binding.root.post {
+                val widthInner =
+                    binding.logo.width + binding.money.width + binding.time.width + 150 // logo间隔
+                // 更新悬浮窗的宽度和高度
+                params.width = widthInner // 新宽度，单位：像素
+                params.height = binding.logo.height + 60 // 新高度，单位：像素
+                // 应用新的布局参数
+                windowManager.updateViewLayout(binding.root, params)
+                binding.root.visibility = View.VISIBLE
+            }
+
+            // 将绑定添加到列表中以便管理
+            floatingViews.add(binding)
+        }
     }
 
     private fun removeTips(binding: FloatTipBinding) {
