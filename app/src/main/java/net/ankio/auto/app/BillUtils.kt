@@ -57,7 +57,7 @@ object BillUtils {
         if (!parentBillInfo.accountNameTo.contains(billInfo.accountNameTo)) {
             parentBillInfo.accountNameTo = billInfo.accountNameTo
         }
-        parentBillInfo.syncFromApp = false
+        parentBillInfo.syncFromApp = 0
         BillInfo.put(parentBillInfo)
     }
 
