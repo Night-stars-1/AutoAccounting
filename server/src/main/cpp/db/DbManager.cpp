@@ -274,10 +274,10 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
     if (id == 0) {
         //id=0表示插入，反之表示更新
         stmt = getStmt(
-                "INSERT INTO billInfo ( type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "INSERT INTO billInfo ( type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
     } else {
         stmt = getStmt(
-                "INSERT OR REPLACE INTO billInfo (id, type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "INSERT OR REPLACE INTO billInfo (id, type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         count = 0;
     }
     if (count == 0) {

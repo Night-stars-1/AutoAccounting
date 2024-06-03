@@ -16,6 +16,7 @@ package net.ankio.auto.utils.server.model
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
 
@@ -107,7 +108,7 @@ class BillInfo {
     /**
      * 是否已从App同步
      */
-    var syncFromApp: Boolean = false
+    var syncFromApp: Int = 0
 
     /**
      * 备注信息
@@ -162,12 +163,16 @@ class BillInfo {
 
         suspend fun getBillByIds(ids: String): Array<BillInfo> {
             val data = AppUtils.getService().sendMsg("bill/list/id", mapOf("ids" to ids))
-            return data as Array<BillInfo>
+            return Gson().fromJson(data as JsonArray, Array<BillInfo>::class.java)
         }
 
         suspend fun getBillByGroup(group: Int): Array<BillInfo> {
             val data = AppUtils.getService().sendMsg("bill/list/child", mapOf("groupId" to group))
-            return data as Array<BillInfo>
+            return if (data !is JsonNull) {
+                Gson().fromJson(data as JsonArray, Array<BillInfo>::class.java)
+            } else {
+                emptyArray()
+            }
         }
 
         fun fromJSON(value: String): BillInfo {
@@ -176,7 +181,7 @@ class BillInfo {
 
         suspend fun getAllParents(): Array<BillInfo> {
             val data = AppUtils.getService().sendMsg("bill/list/parent", null)
-            return data as Array<BillInfo>
+            return Gson().fromJson(data as JsonArray, Array<BillInfo>::class.java)
         }
     }
 }
