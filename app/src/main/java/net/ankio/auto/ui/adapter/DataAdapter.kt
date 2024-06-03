@@ -113,9 +113,12 @@ class DataAdapter(
             binding.uploadData.visibility = View.GONE
             binding.issue.text = "# ${appData.issue}"
         }
+        /*
+        作用未知
         holder.scope.launch {
             tryAdaptUnmatchedItems(holder, this@DataAdapter)
         }
+         */
         val app = AppUtils.getAppInfoFromPackageName(item.source, context)
 
         binding.app.text =

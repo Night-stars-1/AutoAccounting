@@ -16,11 +16,14 @@
 package net.ankio.auto.app.js
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ankio.auto.utils.AppTimeMonitor
 import net.ankio.auto.utils.AppUtils
+import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.server.model.BillInfo
+
 
 data class Data(
     val type: Int,
@@ -38,14 +41,13 @@ object Engine {
     ): BillInfo? =
         withContext(Dispatchers.IO) {
             AppTimeMonitor.startMonitoring("规则识别")
-            val gson = Gson()
             val json =
                 AppUtils.getService().sendMsg(
                     "analyze",
-                    gson.toJson(Data(dataType, app, data, if (call) 1 else 0)),
-                )
+                    Data(dataType, app, data, if (call) 1 else 0),
+                ) as JsonObject
 
-            val billInfo = runCatching { json as BillInfo }.getOrNull()
+            val billInfo = runCatching { Gson().fromJson(json, BillInfo::class.java) }.getOrNull()
 
             AppTimeMonitor.stopMonitoring("规则识别")
             billInfo
