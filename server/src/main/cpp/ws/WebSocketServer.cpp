@@ -69,7 +69,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
         std::string message_id = json["id"].asString();
         std::string message_type = json["type"].asString();
-        std::string message_token = json["token"].asString();
+
         printf("message_type: %s\n", message_type.c_str());
 
 
@@ -92,7 +92,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             return;
         }
 
-        if (clients.find(client) == clients.end() && message_token != token) {
+        if (clients.find(client) == clients.end()) {
             printf("client not auth\n");
             ws_close_client(client);
             return;
@@ -473,9 +473,9 @@ void WebSocketServer::initToken() {
     fclose(file);
 
     publishToken();
-
-
 }
+
+
 
 void WebSocketServer::publishToken() {
     //检查是否存在apps.txt，如果有就逐行读取
@@ -494,8 +494,6 @@ void WebSocketServer::publishToken() {
                 fprintf(appFile, "%s", token.c_str());
                 fclose(appFile);
                 chmod(path.c_str(), 0777);
-            } else {
-                printf("file not exists %s\n", appPath.c_str());
             }
         }
         fclose(appsFile);
@@ -526,7 +524,7 @@ void WebSocketServer::log(const std::string &msg,int level ){
 
 std::string WebSocketServer::runJs(const std::string &js) {
     log("执行JS脚本",LOG_LEVEL_INFO);
-    log("js内容: " + js,LOG_LEVEL_DEBUG);
+    log(js,LOG_LEVEL_DEBUG);
     qjs::Runtime runtime;
     qjs::Context context(runtime);
     std::thread::id id = std::this_thread::get_id();
@@ -537,7 +535,7 @@ std::string WebSocketServer::runJs(const std::string &js) {
              import { print } from 'MyModule';
             globalThis.print = print;
         )xxx", "<import>", JS_EVAL_TYPE_MODULE);
-        log("前置变量载入完成", LOG_LEVEL_INFO);
+
         context.eval(js);
         std::lock_guard<std::mutex> lock(resultMapMutex);
         std::string data = resultMap[id];

@@ -112,8 +112,10 @@ task extractArraysToTxt {
             def arraysXmlContent = arraysXmlFile.text
             def extractedData = arraysXmlContent.replaceAll(/<.*?>/, '').trim() // 简单地移除 XML 标签
 
+            def unixStyleData = extractedData.replaceAll("\r\n", "\n")
+
             // 写入到 txt 文件
-            outputTxtFile.text = extractedData
+            outputTxtFile.text = unixStyleData
         }
     }
 }
@@ -122,7 +124,8 @@ task extractArraysToTxt {
 preBuild.dependsOn extractArraysToTxt
 
 
-
+// 构建apk之前，先构建server模块
+preBuild.dependsOn(":server:assembleRelease")
 
 dependencies {
 

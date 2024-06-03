@@ -35,6 +35,7 @@ import net.ankio.auto.databinding.AboutDialogBinding
 import net.ankio.auto.databinding.FragmentHomeBinding
 import net.ankio.auto.events.UpdateFinishEvent
 import net.ankio.auto.events.UpdateSuccessEvent
+import net.ankio.auto.exceptions.UnsupportedDeviceException
 import net.ankio.auto.ui.dialog.AssetsSelectorDialog
 import net.ankio.auto.ui.dialog.BookInfoDialog
 import net.ankio.auto.ui.dialog.BookSelectorDialog
@@ -50,6 +51,7 @@ import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.Category
 import net.ankio.auto.utils.update.UpdateUtils
 import rikka.html.text.toHtml
+import java.io.File
 
 /**
  * A simple [Fragment] subclass.
@@ -58,10 +60,22 @@ import rikka.html.text.toHtml
  */
 class HomeFragment : BaseFragment() {
     private lateinit var binding: FragmentHomeBinding
+    private var cacheDir: File? = null
+
     override val menuList: ArrayList<MenuItem> =
         arrayListOf(
             MenuItem(R.string.title_setting, R.drawable.menu_item_setting) {
                 it.navigate(R.id.setting2Fragment)
+            },
+            MenuItem(R.string.stop, R.drawable.stop_circle_outline) {
+                lifecycleScope.launch {
+                    cacheDir = AppUtils.getApplication().externalCacheDir
+                    if (cacheDir === null) {
+                        throw UnsupportedDeviceException(getString(R.string.unsupport_device))
+                    }
+                    AppUtils.getService().copyAssets()
+                }
+                serverByRoot("sh ${cacheDir!!.path}/shell/stop.sh")
             },
             MenuItem(R.string.title_more, R.drawable.menu_item_more) {
                 val binding =

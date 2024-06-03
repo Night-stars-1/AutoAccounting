@@ -22,13 +22,24 @@ import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.zackratos.ultimatebarx.ultimatebarx.addNavigationBarBottomPadding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.ankio.auto.R
 import net.ankio.auto.databinding.ActivityMainBinding
+import net.ankio.auto.databinding.DialogProgressBinding
 import net.ankio.auto.ui.activity.MainActivity
 import net.ankio.auto.ui.utils.MenuItem
 import net.ankio.auto.utils.AppUtils
+import net.ankio.auto.utils.Logger
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 abstract class BaseFragment : Fragment() {
     open val menuList: ArrayList<MenuItem> = arrayListOf()
@@ -130,5 +141,75 @@ abstract class BaseFragment : Fragment() {
         }
         colorAnimator.duration = duration
         colorAnimator.start()
+    }
+
+    public fun serverByRoot(shell: String) {
+        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
+        val textView = dialogBinding.progressText
+        val scrollView = dialogBinding.scrollView
+        val progressDialog =
+            MaterialAlertDialogBuilder(requireActivity())
+                .setTitle(R.string.title_command)
+                .setView(dialogBinding.root)
+                .setCancelable(false) // 设置对话框不可关闭
+                .show()
+
+        // 在协程中检查 root 权限并执行命令
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val process = Runtime.getRuntime().exec("su -t 1")
+                val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
+                val errorReader = BufferedReader(InputStreamReader(process.errorStream))
+                val bufferedWriter = OutputStreamWriter(process.outputStream)
+
+                Logger.i("Executing shell command: $shell")
+
+                // 写入命令
+                bufferedWriter.write(shell + "\n")
+                bufferedWriter.flush()
+                bufferedWriter.close()
+
+                var line: String?
+                while (bufferedReader.readLine().also { line = it } != null) {
+                    withContext(Dispatchers.Main) {
+                        // 更新 TextView 来显示命令输出
+                        textView.append(line + "\n")
+                        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+                    }
+                }
+                // 读取错误输出
+                while (errorReader.readLine().also { line = it } != null) {
+                    withContext(Dispatchers.Main) {
+                        // 更新 TextView 来显示命令输出
+                        textView.append("[ERROR] $line\n")
+                        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+                    }
+                }
+                // 等待进程结束
+                val exitCode = process.waitFor()
+                withContext(Dispatchers.Main) {
+                    if (exitCode == 0) {
+                        textView.append("[SUCCESS] 命令执行成功\n")
+                    } else {
+                        textView.append("[FAILURE] 命令执行失败，退出代码: $exitCode\n")
+                    }
+                    scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+                }
+                process.waitFor()
+                bufferedReader.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Logger.e("Error executing shell command", e)
+                withContext(Dispatchers.Main) {
+                    textView.append(getText(R.string.no_root_permission))
+                }
+            } finally {
+                // 等待5秒钟关闭对话框
+                delay(5000L)
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                }
+            }
+        }
     }
 }

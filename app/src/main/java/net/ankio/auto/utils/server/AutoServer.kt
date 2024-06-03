@@ -175,11 +175,8 @@ class AutoServer {
                     t: Throwable,
                     response: Response?,
                 ) {
-                    if (!t.message?.contains("unexpected end of stream")!!) {
-                        Logger.e("WebSocket error: " + t.message, t)
-                        EventBus.post(AutoServiceErrorEvent(AutoServiceException(t.message ?: "WebSocket error")))
-                        return
-                    }
+                    Logger.e("WebSocket error: " + t.message, t)
+                    EventBus.post(AutoServiceErrorEvent(AutoServiceException(t.message ?: "WebSocket error")))
                 }
             }
 
@@ -195,7 +192,7 @@ class AutoServer {
         withContext(Dispatchers.IO) {
             val context = AppUtils.getApplication()
             val cacheDir = context.externalCacheDir!!.absolutePath + File.separator + "shell"
-            val copyFiles = arrayListOf("version.txt", "starter.sh", "apps.txt")
+            val copyFiles = arrayListOf("version.txt", "starter.sh", "stop.sh", "apps.txt")
             // 检查cpu架构
             val cpu = System.getProperty("os.arch")!!
             val androidCpu =
