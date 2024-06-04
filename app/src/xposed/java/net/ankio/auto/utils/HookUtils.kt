@@ -30,7 +30,9 @@ import kotlinx.coroutines.withContext
 import net.ankio.auto.BuildConfig
 import net.ankio.auto.HookMainApp
 import net.ankio.auto.app.js.Engine
+import net.ankio.auto.events.AutoServerConnectedEvent
 import net.ankio.auto.exceptions.AutoServiceException
+import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.LogModel
 
 class HookUtils(val context: Application, private val packageName: String) {
@@ -45,6 +47,9 @@ class HookUtils(val context: Application, private val packageName: String) {
 
         AppUtils.setApplication(context)
         AppUtils.getService().connect()
+        EventBus.register(AutoServerConnectedEvent::class.java) {
+            toast("自动记账服务已连接")
+        }
         XposedBridge.hookAllMethods(
             ClassLoader::class.java,
             "loadClass",
@@ -192,7 +197,7 @@ class HookUtils(val context: Application, private val packageName: String) {
     }
 
     fun toast(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
     /**

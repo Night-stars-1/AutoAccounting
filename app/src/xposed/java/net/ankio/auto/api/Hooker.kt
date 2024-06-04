@@ -111,7 +111,7 @@ abstract class Hooker : iHooker {
         }
     }
 
-    fun initLoadPackage(
+    private fun initLoadPackage(
         classLoader: ClassLoader,
         application: Application,
     ) {
