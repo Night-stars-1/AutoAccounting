@@ -47,6 +47,7 @@ import net.ankio.auto.utils.CustomTabsHelper
 import net.ankio.auto.utils.Github
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
+import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.server.model.AppData
 import net.ankio.auto.utils.server.model.LogModel
 
@@ -100,7 +101,7 @@ class DataFragment : BaseFragment() {
                         val result = Engine.analyze(item.type, item.source, item.data, false, item.id)
                         if (result == null) {
                             // 弹出吐司
-                            Toast.makeText(requireContext(), R.string.no_match, Toast.LENGTH_SHORT).show()
+                            ToastUtil.toast(R.string.no_match)
                         } else {
                             val tpl = SpUtils.getString("setting_bill_remark", "【商户名称】 - 【商品名称】")
                             result.remark = BillUtils.getRemark(result, tpl)

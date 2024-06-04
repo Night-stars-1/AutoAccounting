@@ -48,6 +48,7 @@ import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.CustomTabsHelper
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
+import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.Category
 import net.ankio.auto.utils.update.UpdateUtils
@@ -209,7 +210,7 @@ class HomeFragment : BaseFragment() {
         }
         EventBus.register(UpdateSuccessEvent::class.java, onUpdateRule)
         binding.checkRuleUpdate.setOnClickListener {
-            Toast.makeText(requireContext(), R.string.check_update, Toast.LENGTH_SHORT).show()
+            ToastUtil.toast(R.string.check_update)
             lifecycleScope.launch {
                 checkUpdate(true)
             }

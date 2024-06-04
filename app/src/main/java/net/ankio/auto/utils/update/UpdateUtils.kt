@@ -27,6 +27,7 @@ import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
+import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.request.RequestsUtils
 
 /**
@@ -96,7 +97,7 @@ class UpdateUtils(private val showResult: Boolean = true) {
                     Logger.i("无需更新")
                     if (showResult) {
                         Handler(Looper.getMainLooper()).post {
-                            Toast.makeText(App.appContext, R.string.no_need_to_update, Toast.LENGTH_SHORT).show()
+                            ToastUtil.toast(R.string.no_need_to_update)
                         }
                     }
 
@@ -107,7 +108,7 @@ class UpdateUtils(private val showResult: Boolean = true) {
                 if (showResult)
                     {
                         Handler(Looper.getMainLooper()).post {
-                            Toast.makeText(App.appContext, R.string.check_update_error, Toast.LENGTH_SHORT).show()
+                            ToastUtil.toast(R.string.check_update_error)
                         }
                     }
             }.getOrNull()
