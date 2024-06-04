@@ -135,10 +135,8 @@ class DataAdapter(
             binding.image.setImageResource(R.drawable.data_sms)
         }
 
-        binding.time.text =
-            item.time.let {
-                DateUtils.getTime(it)
-            }
+        binding.time.text = DateUtils.getTime(item.time)
+
         binding.rule.visibility = View.VISIBLE
         if (item.match != 1) {
             binding.rule.visibility = View.GONE

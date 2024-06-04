@@ -46,13 +46,21 @@ object DateUtils {
         format: String,
         time: Long,
     ): String {
-        return SimpleDateFormat(format, Locale.getDefault()).format(Date(time))
+        // 判断 time 是否以秒为单位
+        val isTimeInSeconds = time < 10000000000L
+
+        // 如果 time 是以秒为单位，将其转换为毫秒
+        val timeInMillis = if (isTimeInSeconds) time * 1000 else time
+
+        // 格式化时间
+        val dateFormat = SimpleDateFormat(format, Locale.getDefault())
+        return dateFormat.format(Date(timeInMillis))
     }
 
     /*
      * 将时间转换为时间戳
      */
-    fun dateToStamp(
+    private fun dateToStamp(
         time: String,
         format: String,
     ): Long {
