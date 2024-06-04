@@ -29,6 +29,7 @@ import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
 import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.request.RequestsUtils
+import net.ankio.auto.utils.server.model.SettingModel
 
 /**
  * 更新工具，用于处理App更新、规则更新
@@ -135,9 +136,10 @@ class UpdateUtils(private val showResult: Boolean = true) {
                 return null
             }
         }
+        val ruleVersion = SettingModel.getInt(App.appContext.packageName, "ruleVersion")
         return request(
             "$ruleUrl/index.json",
-            SpUtils.getInt("ruleVersion", 0),
+            ruleVersion,
             0,
         )
     }

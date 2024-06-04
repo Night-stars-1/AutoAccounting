@@ -127,6 +127,20 @@ class UpdateDialog(
                     },
                 )
             }
+            SettingModel.set(
+                SettingModel().apply {
+                    app = context.packageName
+                    key = "ruleVersionName"
+                    value = version
+                },
+            )
+            SettingModel.set(
+                SettingModel().apply {
+                    app = context.packageName
+                    key = "ruleVersion"
+                    value = code.toString()
+                },
+            )
         }.onFailure {
             if (it is AutoServiceException) {
                 withContext(Dispatchers.Main) {
@@ -138,8 +152,6 @@ class UpdateDialog(
                 EventBus.post(UpdateFinishEvent())
             }
         }.onSuccess {
-            SpUtils.putString("ruleVersionName", version)
-            SpUtils.putInt("ruleVersion", code)
             withContext(Dispatchers.Main) {
                 EventBus.post(UpdateFinishEvent())
             }

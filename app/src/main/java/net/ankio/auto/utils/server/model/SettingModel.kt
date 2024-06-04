@@ -15,6 +15,8 @@
 
 package net.ankio.auto.utils.server.model
 
+import com.google.gson.JsonNull
+import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import net.ankio.auto.utils.AppUtils
 
@@ -35,7 +37,27 @@ class SettingModel {
             key: String,
         ): String {
             val data = AppUtils.getService().sendMsg("setting/get", mapOf("app" to app, "key" to key))
-            return runCatching { data as String }.getOrNull() ?: ""
+            return if (data !is JsonNull && data != null) {
+                (data as JsonPrimitive).asString
+            } else {
+                ""
+            }
+        }
+
+        suspend fun getInt(
+            app: String,
+            key: String,
+        ): Int {
+            val data = AppUtils.getService().sendMsg("setting/get", mapOf("app" to app, "key" to key))
+            return if (data is JsonPrimitive) {
+                if (data.asString.isEmpty()) {
+                    0
+                } else {
+                    data.asInt
+                }
+            } else {
+                0
+            }
         }
     }
 }

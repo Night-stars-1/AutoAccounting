@@ -51,6 +51,7 @@ import net.ankio.auto.utils.SpUtils
 import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.Category
+import net.ankio.auto.utils.server.model.SettingModel
 import net.ankio.auto.utils.update.UpdateUtils
 import rikka.html.text.toHtml
 import java.io.File
@@ -195,11 +196,15 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun bindRuleUI() {
-        val ruleVersion = SpUtils.getString("ruleVersionName", "None")
-        binding.ruleVersion.text = ruleVersion
+        lifecycleScope.launch {
+            var ruleVersionName = SettingModel.get(context?.packageName.toString(), "ruleVersionName")
+            if (ruleVersionName.isEmpty())
+                ruleVersionName = "None"
+            binding.ruleVersion.text = ruleVersionName
+        }
     }
 
-    private val onUpdateRule = { event: UpdateSuccessEvent ->
+    private val onUpdateRule = { _: UpdateSuccessEvent ->
         Toaster.show(R.string.update_success)
         bindRuleUI()
     }

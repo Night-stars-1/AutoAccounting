@@ -85,7 +85,7 @@ class FloatEditorDialog(
         binding = FloatEditorBinding.inflate(inflater)
         cardView = binding.editorCard
 
-        Logger.d("原始账单结果 => $rawBillInfo")
+        Logger.d("原始账单结果 => ${rawBillInfo.toString()}")
         billTypeLevel1 = BillType.fromInt(rawBillInfo.type)
         billTypeLevel2 = BillType.fromInt(rawBillInfo.type)
         binding.radioContainer.check(binding.radioNone.id)
@@ -175,7 +175,7 @@ class FloatEditorDialog(
 
             this.currency = billInfo.currency
 
-            this.timeStamp = billInfo.timeStamp
+            this.time = billInfo.timeStamp
             this.remark = binding.remark.text.toString()
         }
     }
@@ -698,7 +698,7 @@ class FloatEditorDialog(
                                 calendar.set(Calendar.MINUTE, selectedMinute)
 
                                 // 最终的日期和时间结果
-                                billInfo.timeStamp = calendar.timeInMillis
+                                billInfo.time = calendar.timeInMillis
                                 bindingTimeUI()
                                 // 处理最终的时间戳
                             },
