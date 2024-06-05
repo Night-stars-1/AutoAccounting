@@ -92,7 +92,7 @@
         </receiver>
         <meta-data
             android:name="com.bugsnag.android.API_KEY"
-            android:value="9658e87e8ef9ebadc43135ff80243696" />
+            android:value="80aa874bb2db672acbe81fb63f10827d" />
     </application>
 
 </manifest>

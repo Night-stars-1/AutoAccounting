@@ -110,7 +110,7 @@ class OrderItemAdapter(
             Assets.getDrawable(billInfo.accountNameFrom, context).let {
                 binding.payTools.setIcon(it, false)
             }
-            AppUtils.getAppInfoFromPackageName(item.from, context)?.let {
+            AppUtils.getAppInfoFromPackageName(item.fromApp, context)?.let {
                 binding.fromApp.setImageDrawable(it.icon)
             }
         }
