@@ -15,6 +15,7 @@
 
 package net.ankio.auto.ui.adapter
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.elevation.SurfaceColors
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ class OrderAdapter(
         binding.groupCard.setCardBackgroundColor(SurfaceColors.SURFACE_1.getColor(context))
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onBindView(
         holder: BaseViewHolder,
         item: Any,

@@ -195,11 +195,11 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string _data = data["data"].asString();
             int _type = data["type"].asInt();
             std::string source = data["source"].asString();
-            int time = data["time"].asInt();
+            int timeStamp = data["timeStamp"].asInt();
             int match = data["match"].asInt();
             int issue = data["issue"].asInt();
             std::string rule = data["rule"].asString();
-            DbManager::getInstance().insertAppData(id, _data, _type, source,rule, time, match, issue);
+            DbManager::getInstance().insertAppData(id, _data, _type, source,rule, timeStamp, match, issue);
         } else if(message_type == "data/get"){
             ret["data"]=DbManager::getInstance().getAppData(data["limit"].asInt());
         } else if(message_type == "data/delete/all") {
@@ -344,10 +344,10 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string app = data["app"].asString();
             int _type = data["type"].asInt();
             int call = data["call"].asInt();
-            int time = std::time(nullptr);
+            int timeStamp = std::time(nullptr);
             if (call == 1) {
                 // 先存data
-                id = DbManager::getInstance().insertAppData(id, _data, _type, app, "", time, 0, 0);
+                id = DbManager::getInstance().insertAppData(id, _data, _type, app, "", timeStamp, 0, 0);
             }
 
             //Json::Value rule = DbManager::getInstance().getRule(app, _type);
@@ -381,7 +381,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                 std::string channel = _json["channel"].asString();
 
                 //自动重新更新，不需要App调用更新
-                DbManager::getInstance().insertAppData(id, _data, _type, app, channel, time, 1, 0);
+                DbManager::getInstance().insertAppData(id, _data, _type, app, channel, timeStamp, 1, 0);
 
                 //分析分类内容
                 std::pair<bool, bool> pair = DbManager::getInstance().checkRule(app, _type,

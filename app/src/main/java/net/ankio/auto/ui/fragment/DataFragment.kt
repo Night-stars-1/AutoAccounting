@@ -15,6 +15,7 @@
 
 package net.ankio.auto.ui.fragment
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -224,6 +225,7 @@ $data
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadMoreData() {
         val loading = LoadingUtils(requireActivity())
         loading.show(R.string.loading)

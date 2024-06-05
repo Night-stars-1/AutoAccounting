@@ -48,9 +48,7 @@ class BillInfo {
      * 记账时间
      * yyyy-MM-dd HH:mm:ss
      */
-    var time: Long = 0 // 纠正参数错误
-    val timeStamp: Long
-        get() = time
+    var timeStamp: Long = 0
 
     /**
      * 商户名称
@@ -124,7 +122,7 @@ class BillInfo {
         billInfo.currency = currency
         billInfo.money = money
         billInfo.fee = fee
-        billInfo.time = time
+        billInfo.timeStamp = timeStamp
         billInfo.shopName = shopName
         billInfo.shopItem = shopItem
         billInfo.cateName = cateName

@@ -17,12 +17,10 @@ package net.ankio.auto.ui.adapter
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.view.Menu
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.elevation.SurfaceColors
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankio.auto.R
 import net.ankio.auto.app.js.Engine
@@ -135,7 +133,7 @@ class DataAdapter(
             binding.image.setImageResource(R.drawable.data_sms)
         }
 
-        binding.time.text = DateUtils.getTime(item.time)
+        binding.time.text = DateUtils.getTime(item.timeStamp)
 
         binding.rule.visibility = View.VISIBLE
         if (item.match != 1) {

@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier
 import java.util.zip.ZipFile
 
 object Dex {
-    fun getAllDexFiles(file: String): List<DexFile> {
+    private fun getAllDexFiles(file: String): List<DexFile> {
         val dexFiles = mutableListOf<DexBackedDexFile>()
         ZipFile(file).use { zipFile ->
             // Iterate over all entries in the ZIP file

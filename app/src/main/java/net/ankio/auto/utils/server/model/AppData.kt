@@ -45,7 +45,7 @@ class AppData {
     /**
      * 时间
      */
-    var time: Long = 0 // 时间
+    var timeStamp: Long = 0 // 时间
 
     /**
      * 是否匹配规则

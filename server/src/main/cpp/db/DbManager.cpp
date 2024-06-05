@@ -29,7 +29,7 @@ void DbManager::initTable() {
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "data TEXT,"
             "source TEXT,"
-            "time INTEGER,"
+            "timeStamp INTEGER,"
             "match INTEGER,"
             "rule TEXT,"
             "issue INTEGER,"
@@ -73,7 +73,7 @@ void DbManager::initTable() {
             "CREATE TABLE IF NOT EXISTS bookBill ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "amount INTEGER,"
-            "time INTEGER,"
+            "timeStamp INTEGER,"
             "remark TEXT,"
             "billId TEXT,"
             "type INTEGER,"
@@ -488,17 +488,17 @@ Json::Value DbManager::buildBill(sqlite3_stmt *stmt){
 }
 
 int DbManager::insertAppData(int id, const std::string &data, int type, const std::string &source,const std::string &rule,
-                              int time, int match, int issue) {
+                              int timeStamp, int match, int issue) {
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt ;
     int count = -1;
     if(id == 0){
         stmt = getStmt(
-                "INSERT INTO appData ( data, type, source, time, match, issue,rule) VALUES (?,?,?,?,?,?,?);");
+                "INSERT INTO appData ( data, type, source, timeStamp, match, issue,rule) VALUES (?,?,?,?,?,?,?);");
     }else{
         count = 0;
         stmt = getStmt(
-                "INSERT OR REPLACE INTO appData (id, data, type, source, time, match, issue,rule) VALUES (?,?,?,?,?,?,?,?);");
+                "INSERT OR REPLACE INTO appData (id, data, type, source, timeStamp, match, issue,rule) VALUES (?,?,?,?,?,?,?,?);");
     }
     if(count == 0){
         sqlite3_bind_int(stmt, count + 1, id);
@@ -506,7 +506,7 @@ int DbManager::insertAppData(int id, const std::string &data, int type, const st
     sqlite3_bind_text(stmt, count + 2, data.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, count + 3, type);
     sqlite3_bind_text(stmt,  count +4, source.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt,  count +5, time);
+    sqlite3_bind_int(stmt,  count +5, timeStamp);
     sqlite3_bind_int(stmt,  count +6, match);
     sqlite3_bind_int(stmt, count + 7, issue);
     sqlite3_bind_text(stmt, count + 8, rule.c_str(), -1, SQLITE_STATIC);
@@ -525,7 +525,7 @@ int DbManager::insertAppData(int id, const std::string &data, int type, const st
 Json::Value DbManager::getAppData(int limit) {
     Json::Value ret;
     char *zErrMsg = nullptr;
-    sqlite3_stmt *stmt = getStmt("SELECT id, data, type, source, time, match, issue, rule FROM appData ORDER BY id DESC LIMIT ?;");
+    sqlite3_stmt *stmt = getStmt("SELECT id, data, type, source, timeStamp, match, issue, rule FROM appData ORDER BY id DESC LIMIT ?;");
     sqlite3_bind_int(stmt, 1, limit);
     int rc = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -534,7 +534,7 @@ Json::Value DbManager::getAppData(int limit) {
         appData["data"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         appData["type"] = sqlite3_column_int(stmt, 2);
         appData["source"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        appData["time"] = sqlite3_column_int(stmt, 4);
+        appData["timeStamp"] = sqlite3_column_int(stmt, 4);
         appData["match"] = sqlite3_column_int(stmt, 5);
         appData["issue"] = sqlite3_column_int(stmt, 6);
         appData["rule"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7));
@@ -1138,7 +1138,7 @@ void DbManager::addBxBills(const Json::Value& billArray){
         for (auto bill : billArray) {
             std::string billId = bill["billId"].asString();
             int amount = bill["amount"].asInt();
-            int time = bill["time"].asInt();
+            int timeStamp = bill["timeStamp"].asInt();
             std::string remark = bill["remark"].asString();
             int type = bill["type"].asInt();
             std::string book = bill["book"].asString();
@@ -1147,11 +1147,11 @@ void DbManager::addBxBills(const Json::Value& billArray){
             std::string accountTo = bill["accountTo"].asString();
 
             sqlite3_stmt *stmt2 = getStmt(
-                    "INSERT INTO bookBill ( billId, amount, time, remark, type, book, category, accountFrom, accountTo) VALUES (?,?,?,?,?,?,?,?,?);");
+                    "INSERT INTO bookBill ( billId, amount, timeStamp, remark, type, book, category, accountFrom, accountTo) VALUES (?,?,?,?,?,?,?,?,?);");
 
             sqlite3_bind_text(stmt2, 1, billId.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_int(stmt2, 2, amount);
-            sqlite3_bind_int(stmt2, 3, time);
+            sqlite3_bind_int(stmt2, 3, timeStamp);
             sqlite3_bind_text(stmt2, 4, remark.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_int(stmt2, 5, type);
             sqlite3_bind_text(stmt2, 6, book.c_str(), -1, SQLITE_STATIC);

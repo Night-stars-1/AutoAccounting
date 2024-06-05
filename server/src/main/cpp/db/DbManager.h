@@ -57,7 +57,7 @@ public:
     Json::Value getBillByGroupId(int groupId);
 
     //App数据
-    int insertAppData(int id,const std::string& data, int type, const std::string& source,const std::string &rule,int time,int match,int issue);
+    int insertAppData(int id,const std::string& data, int type, const std::string& source,const std::string &rule,int timeStamp,int match,int issue);
     Json::Value getAppData(int limit);
     void deleteAllAppData();
 
