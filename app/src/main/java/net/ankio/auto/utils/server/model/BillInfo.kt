@@ -145,6 +145,7 @@ class BillInfo {
 
     companion object {
         suspend fun put(billInfo: BillInfo): Int {
+            billInfo.timeStamp = billInfo.timeStamp.toString().substring(0, 10).toLong()
             return AppUtils.getService().sendMsg("bill/put", billInfo) as Int
         }
 

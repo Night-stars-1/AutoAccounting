@@ -96,16 +96,12 @@ class FloatingWindowService : Service(), CoroutineScope {
                         continue
                     }
                     billInfo = list.removeFirst()
-                    runCatching {
+                    if (AppUtils.checkOverlayPermission(themedContext)) {
                         processBillInfo()
-                    }.onFailure {
-                        if (it is BadTokenException) {
-                            if (it.message != null && it.message!!.contains("permission denied")) {
-                                Toaster.show(R.string.floatTip)
-                                FloatPermissionUtils.requestPermission(themedContext)
-                            }
-                        }
-                        Logger.e("记账失败", it)
+                    } else {
+                        Toaster.show(R.string.floatTip)
+                        FloatPermissionUtils.requestPermission(themedContext)
+                        Logger.e("记账失败，无悬浮窗权限")
                     }
                 }
             }

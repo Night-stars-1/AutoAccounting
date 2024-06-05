@@ -401,7 +401,7 @@ Json::Value DbManager::getBillListGroup(int limit) {
     Json::Value ret;
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt = getStmt(
-            "SELECT strftime('%Y-%m-%d', timeStamp / 1000, 'unixepoch') as date, group_concat(id) as ids FROM billInfo WHERE groupId = 0 GROUP BY date ORDER BY date DESC LIMIT ?;"
+            "SELECT strftime('%Y-%m-%d', timeStamp, 'unixepoch') as date, group_concat(id) as ids FROM billInfo WHERE groupId = 0 GROUP BY date ORDER BY date DESC LIMIT ?;"
     );
     sqlite3_bind_int(stmt, 1, limit);
     int rc = 0;

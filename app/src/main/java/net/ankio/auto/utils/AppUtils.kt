@@ -30,6 +30,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Process
+import android.provider.Settings
 import androidx.annotation.AttrRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.ResourcesCompat
@@ -257,5 +258,12 @@ object AppUtils {
 
     fun getService(): AutoServer {
         return server
+    }
+
+    /**
+     * 检查是否有悬浮窗权限
+     */
+    fun checkOverlayPermission(context: Context?): Boolean {
+        return Settings.canDrawOverlays(context)
     }
 }

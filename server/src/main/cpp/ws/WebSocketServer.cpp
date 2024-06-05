@@ -416,6 +416,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
                         _json["bookName"] = bookName;
                         _json["cateName"] = cateName;
+                        _json["timeStamp"] = _json["time"]; // 参数纠正
 
 
 
