@@ -204,6 +204,7 @@ abstract class BaseFragment : Fragment() {
                     textView.append(getText(R.string.no_root_permission))
                 }
             } finally {
+                progressDialog.setCancelable(true) // 设置对话框可关闭
                 // 等待5秒钟关闭对话框
                 delay(5000L)
                 withContext(Dispatchers.Main) {

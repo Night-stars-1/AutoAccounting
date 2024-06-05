@@ -107,7 +107,7 @@ class HomeFragment : BaseFragment() {
 
         bindBookAppEvents()
 
-        // 检查更新
+        // 检查规则更新
         EventBus.register(UpdateSuccessEvent::class.java) {
             lifecycleScope.launch {
                 checkUpdate(false)
