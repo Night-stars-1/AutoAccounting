@@ -107,6 +107,8 @@ class HomeFragment : BaseFragment() {
 
         bindBookAppEvents()
 
+        // 检查更新
+        EventBus.register(UpdateSuccessEvent::class.java, onUpdateRule)
         bindRuleEvents()
 
         bindingCommunicationEvents()
@@ -219,9 +221,6 @@ class HomeFragment : BaseFragment() {
             lifecycleScope.launch {
                 checkUpdate(true)
             }
-        }
-        lifecycleScope.launch {
-            checkUpdate(false)
         }
     }
 
@@ -348,8 +347,9 @@ class HomeFragment : BaseFragment() {
         )
         val versionName = AppUtils.getVersionName()
         val names = versionName.split(" - ")
+        val frameworkName = ActiveUtils.getFramework()
         binding.msgLabel.text = names[0].trim()
-        binding.msgLabel2.text = getString(R.string.releaseInfo)
+        binding.msgLabel2.text = getString(R.string.releaseInfo).replace("xposed", frameworkName)
         binding.imageView.setColorFilter(textColor)
         binding.msgLabel.setTextColor(textColor)
         binding.msgLabel2.setTextColor(textColor)
