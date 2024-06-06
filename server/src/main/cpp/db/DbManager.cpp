@@ -85,17 +85,19 @@ void DbManager::initTable() {
             "CREATE TABLE IF NOT EXISTS bookName ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "name TEXT,"
-            "icon TEXT"
+            "icon TEXT,"
+            "relateId TEXT"
             ");",
             "CREATE TABLE IF NOT EXISTS category ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "name TEXT,"
             "icon TEXT,"
             "remoteId TEXT,"
-            "parent INTEGER,"
-            "book INTEGER,"
+            "parent TEXT,"
+            "book TEXT,"
             "sort INTEGER,"
-            "type INTEGER"
+            "type INTEGER,"
+            "relateId TEXT"
             ");",
 
             "CREATE TABLE IF NOT EXISTS customRule ("
@@ -698,23 +700,24 @@ void DbManager::removeAssetMap(int id) {
 }
 
 
-void DbManager::insertBookName(int id, const std::string &name, const std::string &icon) {
+void DbManager::insertBookName(int id, const std::string &name, const std::string &icon, const std::string &relateId) {
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt;
     int count = -1;
     if(id == 0){
         stmt = getStmt(
-                "INSERT INTO bookName ( name, icon) VALUES (?,?);");
+                "INSERT INTO bookName ( name, icon, relateId) VALUES (?,?,?);");
     }else{
         count = 0;
         stmt = getStmt(
-                "INSERT OR REPLACE INTO bookName (id, name, icon) VALUES (?,?,?);");
+                "INSERT OR REPLACE INTO bookName (id, name, icon, relateId) VALUES (?,?,?, ?);");
     }
     if(count == 0){
         sqlite3_bind_int(stmt, count + 1, id);
     }
     sqlite3_bind_text(stmt, count + 2, name.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, count + 3, icon.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, count + 4, relateId.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
         fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
@@ -732,6 +735,7 @@ Json::Value DbManager::getBookName() {
         bookName["id"] = sqlite3_column_int(stmt, 0);
         bookName["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         bookName["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        bookName["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         ret.append(bookName);
     }
     if (rc != SQLITE_DONE) {
@@ -762,6 +766,7 @@ Json::Value DbManager::getBookName(const std::string& name){
         bookName["id"] = sqlite3_column_int(stmt, 0);
         bookName["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         bookName["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        bookName["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
     }
     if (rc != SQLITE_DONE) {
         fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
@@ -780,6 +785,7 @@ Json::Value DbManager::getOneBookName() {
         bookName["id"] = sqlite3_column_int(stmt, 0);
         bookName["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         bookName["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        bookName["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         ret.append(bookName);
     }
     if (rc != SQLITE_DONE) {
@@ -791,17 +797,17 @@ Json::Value DbManager::getOneBookName() {
 
 
 int DbManager::insertCate(int id, const std::string &name, const std::string &icon,
-                          const std::string &remoteId, int parent, int book, int sort, int type) {
+                          const std::string &remoteId, const std::string &parent, const std::string &book, int sort, int type, const std::string &relateId) {
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt;
     int count = -1;
     if (id == 0) {
         stmt = getStmt(
-                "INSERT INTO category ( name, icon, remoteId, parent, book, sort, type) VALUES (?,?,?,?,?,?,?);");
+                "INSERT INTO category ( name, icon, remoteId, parent, book, sort, type, relateId) VALUES (?,?,?,?,?,?,?,?);");
     } else {
         count = 0;
         stmt = getStmt(
-                "INSERT OR REPLACE INTO category (id, name, icon, remoteId, parent, book, sort, type) VALUES (?,?,?,?,?,?,?,?);");
+                "INSERT OR REPLACE INTO category (id, name, icon, remoteId, parent, book, sort, type, relateId) VALUES (?,?,?,?,?,?,?,?,?);");
 
     }
     if (count == 0) {
@@ -810,10 +816,11 @@ int DbManager::insertCate(int id, const std::string &name, const std::string &ic
     sqlite3_bind_text(stmt, count + 2, name.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, count + 3, icon.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, count + 4, remoteId.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, count + 5, parent);
-    sqlite3_bind_int(stmt, count + 6, book);
+    sqlite3_bind_text(stmt, count + 5, parent.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, count + 6, book.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, count + 7, sort);
     sqlite3_bind_int(stmt, count + 8, type);
+    sqlite3_bind_text(stmt, count + 9, relateId.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
         fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
@@ -822,13 +829,13 @@ int DbManager::insertCate(int id, const std::string &name, const std::string &ic
     return sqlite3_last_insert_rowid(db);
 }
 
-Json::Value DbManager::getAllCate(int parent, int book, int type) {
+Json::Value DbManager::getAllCate(const std::string &parent, const std::string &book, int type) {
     Json::Value ret;
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt = getStmt(
             "SELECT * FROM category WHERE parent = ? AND book = ? AND type = ? ORDER BY sort;");
-    sqlite3_bind_int(stmt, 1, parent);
-    sqlite3_bind_int(stmt, 2, book);
+    sqlite3_bind_text(stmt, 1, parent.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, book.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 3, type);
     int rc = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -837,10 +844,11 @@ Json::Value DbManager::getAllCate(int parent, int book, int type) {
         cate["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         cate["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         cate["remoteId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        cate["parent"] = sqlite3_column_int(stmt, 4);
-        cate["book"] = sqlite3_column_int(stmt, 5);
+        cate["parent"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        cate["book"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
         cate["sort"] = sqlite3_column_int(stmt, 6);
         cate["type"] = sqlite3_column_int(stmt, 7);
+        cate["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 8));
        // cate["child"] = getAllCate(db, sqlite3_column_int(stmt, 0), book, type);
         ret.append(cate);
     }
@@ -851,14 +859,12 @@ Json::Value DbManager::getAllCate(int parent, int book, int type) {
     return ret;
 }
 
-Json::Value DbManager::getCate(int book, const std::string &cateName,int type) {
+Json::Value DbManager::getBookAllCate(const std::string &book) {
     Json::Value ret;
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt = getStmt(
-            "SELECT * FROM category WHERE book = ? AND name = ? AND type = ?;");
-    sqlite3_bind_int(stmt, 1, book);
-    sqlite3_bind_text(stmt, 2, cateName.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 3, type);
+            "SELECT * FROM category WHERE book = ? ORDER BY sort;");
+    sqlite3_bind_text(stmt, 1, book.c_str(), -1, SQLITE_STATIC);
     int rc = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         Json::Value cate;
@@ -866,10 +872,12 @@ Json::Value DbManager::getCate(int book, const std::string &cateName,int type) {
         cate["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         cate["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         cate["remoteId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        cate["parent"] = sqlite3_column_int(stmt, 4);
-        cate["book"] = sqlite3_column_int(stmt, 5);
+        cate["parent"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        cate["book"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
         cate["sort"] = sqlite3_column_int(stmt, 6);
         cate["type"] = sqlite3_column_int(stmt, 7);
+        cate["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 8));
+        // cate["child"] = getAllCate(db, sqlite3_column_int(stmt, 0), book, type);
         ret.append(cate);
     }
     if (rc != SQLITE_DONE) {
@@ -879,12 +887,41 @@ Json::Value DbManager::getCate(int book, const std::string &cateName,int type) {
     return ret;
 }
 
-Json::Value DbManager::getCateByRemote(int book, const std::string &remoteId) {
+Json::Value DbManager::getCate(const std::string &book, const std::string &cateName,int type) {
+    Json::Value ret;
+    char *zErrMsg = nullptr;
+    sqlite3_stmt *stmt = getStmt(
+            "SELECT * FROM category WHERE book = ? AND name = ? AND type = ?;");
+    sqlite3_bind_text(stmt, 1, book.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, cateName.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, type);
+    int rc = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        Json::Value cate;
+        cate["id"] = sqlite3_column_int(stmt, 0);
+        cate["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        cate["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        cate["remoteId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+        cate["parent"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        cate["book"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        cate["sort"] = sqlite3_column_int(stmt, 6);
+        cate["type"] = sqlite3_column_int(stmt, 7);
+        cate["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 8));
+        ret.append(cate);
+    }
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+    return ret;
+}
+
+Json::Value DbManager::getCateByRemote(const std::string &book, const std::string &remoteId) {
     Json::Value ret;
     char *zErrMsg = nullptr;
     sqlite3_stmt *stmt = getStmt(
             "SELECT * FROM category WHERE book = ? AND remoteId = ?  limit 1;");
-    sqlite3_bind_int(stmt, 1, book);
+    sqlite3_bind_text(stmt, 1, book.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, remoteId.c_str(), -1, SQLITE_STATIC);
     int rc = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -893,9 +930,10 @@ Json::Value DbManager::getCateByRemote(int book, const std::string &remoteId) {
         ret["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         ret["remoteId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         ret["parent"] = sqlite3_column_int(stmt, 4);
-        ret["book"] = sqlite3_column_int(stmt, 5);
+        ret["book"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
         ret["sort"] = sqlite3_column_int(stmt, 6);
         ret["type"] = sqlite3_column_int(stmt, 7);
+        ret["relateId"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 8));
     }
     if (rc != SQLITE_DONE) {
         fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));

@@ -73,17 +73,18 @@ public:
     void removeAssetMap(int id);
 
     //BookName
-    void insertBookName(int id, const std::string& name, const std::string&  icon);
+    void insertBookName(int id, const std::string& name, const std::string& icon, const std::string& relateId);
     Json::Value getOneBookName();
     Json::Value getBookName(const std::string& name);
     Json::Value getBookName();
     void removeBookName(const std::string& name);
 
     //分类
-    int insertCate(int id, const std::string& name, const std::string&  icon, const std::string&  remoteId,int parent,int book,int sort,int type);
-    Json::Value getAllCate(int book, int type = 0,int parent = 0);
-    Json::Value getCate(int book,const std::string& cateName,int type);
-    Json::Value getCateByRemote(int book,const std::string& remoteId);
+    int insertCate(int id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type, const std::string& relateId);
+    Json::Value getAllCate(const std::string& parent = 0,const std::string& book = "", int type = 0);
+    Json::Value getBookAllCate(const std::string& book = "");
+    Json::Value getCate(const std::string& book,const std::string& cateName,int type);
+    Json::Value getCateByRemote(const std::string& book,const std::string& remoteId);
     void removeCate(int id);
 
     //自定义分类规则

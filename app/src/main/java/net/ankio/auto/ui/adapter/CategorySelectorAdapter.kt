@@ -15,6 +15,7 @@
 
 package net.ankio.auto.ui.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -163,11 +164,11 @@ class CategorySelectorAdapter(
          * item渲染
          */
         fun renderItem(item: Category) {
-            if (item.parent != -1) {
+            if (item.parent != "-1") {
                 binding.ivMore.visibility = View.GONE
             } else {
                 scope.launch {
-                    val count = Category.getAll(item.book, item.id, item.type).size
+                    val count = Category.getAll(item.book, item.type, item.parent).size
                     if (count == 0) {
                         withContext(Dispatchers.Main) {
                             binding.ivMore.visibility = View.GONE
@@ -213,6 +214,7 @@ class CategorySelectorAdapter(
         /**
          * 更新面板内容，由于面板复用的时候是全部内容替换，所以使用NotifyDataSetChanged
          */
+        @SuppressLint("NotifyDataSetChanged")
         fun updatePanel(item: Category) {
             val leftDistanceView2: Int = item.id
             val layoutParams = binding.imageView.layoutParams as ViewGroup.MarginLayoutParams
@@ -234,6 +236,9 @@ class CategorySelectorAdapter(
                             items.addAll(collection)
                             adapter.notifyDataSetChanged()
                         }
+                    } else {
+                        items.clear()
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }

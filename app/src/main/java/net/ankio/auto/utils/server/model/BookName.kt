@@ -37,6 +37,11 @@ class BookName {
      */
     var icon: String = "" // 图标
 
+    /**
+     * 关联id
+     */
+    var relateId: String = ""
+
     companion object {
         fun put(book: BookName) {
             AppUtils.getScope().launch {

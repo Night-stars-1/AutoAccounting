@@ -243,7 +243,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             int id = data["id"].asInt();
             std::string name = data["name"].asString();
             std::string icon = data["icon"].asString();
-            DbManager::getInstance().insertBookName(id, name, icon);
+            std::string relateId = data["relateId"].asString();
+            DbManager::getInstance().insertBookName(id, name, icon, relateId);
         } else if(message_type == "book/get/one"){
             ret["data"] = DbManager::getInstance().getOneBookName();
         } else if(message_type == "book/get/name"){
@@ -269,23 +270,27 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string name = data["name"].asString();
             std::string icon = data["icon"].asString();
             std::string remoteId = data["remoteId"].asString();
-            int parent = data["parent"].asInt();
-            int book = data["book"].asInt();
+            std::string parent = data["parent"].asString();
+            std::string book = data["book"].asString();
             int sort = data["sort"].asInt();
             int _type = data["type"].asInt();
-            DbManager::getInstance().insertCate(id, name, icon, remoteId, parent, book, sort, _type);
+            std::string relateId = data["relateId"].asString();
+            DbManager::getInstance().insertCate(id, name, icon, remoteId, parent, book, sort, _type, relateId);
         } else if(message_type == "cate/get/all"){
-            int book = data["book"].asInt();
+            std::string book = data["book"].asString();
             int _type = data["type"].asInt();
-            int parent = data["parent"].asInt();
-            ret["data"] = DbManager::getInstance().getAllCate(book, _type, parent);
+            std::string parent = data["parent"].asString();
+            ret["data"] = DbManager::getInstance().getAllCate(parent, book, _type);
+        } else if(message_type == "cate/get/book"){
+            std::string book = data["book"].asString();
+            ret["data"] = DbManager::getInstance().getBookAllCate(book);
         } else if(message_type == "cate/get/name"){
-            int book = data["book"].asInt();
+            std::string book = data["book"].asString();
             int _type = data["type"].asInt();
             std::string cateName = data["cateName"].asString();
             ret["data"] = DbManager::getInstance().getCate(book, cateName,_type);
         } else if(message_type == "cate/get/remote"){
-            int book = data["book"].asInt();
+            std::string book = data["book"].asString();
             std::string remoteId = data["remoteId"].asString();
             ret["data"] = DbManager::getInstance().getCateByRemote(book, remoteId);
         } else if(message_type == "cate/remove"){

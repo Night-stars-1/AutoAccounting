@@ -44,12 +44,12 @@ class Category {
     /**
      * 父类id
      */
-    var parent: Int = -1
+    var parent: String = "-1"
 
     /**
      * 所属账本
      */
-    var book: Int = 1
+    var book: String = ""
 
     /**
      * 排序
@@ -62,10 +62,15 @@ class Category {
      */
     var type: Int = 0
 
+    /**
+     * 关联id
+     */
+    var relateId: String = ""
+
     companion object {
         suspend fun getDrawable(
             cateName: String,
-            bookID: Int,
+            bookID: String,
             context: Context,
         ): Drawable {
             var newCateName = cateName
@@ -83,9 +88,9 @@ class Category {
         }
 
         suspend fun getAll(
-            bookID: Int,
+            bookID: String,
             type: Int,
-            parent: Int,
+            parent: String,
         ): List<Category> {
             val data = AppUtils.getService().sendMsg("cate/get/all", mapOf("book" to bookID, "type" to type, "parent" to parent))
             return if (data !is JsonNull) {
@@ -95,9 +100,9 @@ class Category {
             }
         }
 
-        suspend fun getByName(
+        private suspend fun getByName(
             name: String,
-            bookID: Int,
+            bookID: String,
         ): Category? {
             val data = AppUtils.getService().sendMsg("cate/get/name", mapOf("name" to name, "book" to bookID))
             return runCatching { Gson().fromJson(data as String, Category::class.java) }.getOrNull()

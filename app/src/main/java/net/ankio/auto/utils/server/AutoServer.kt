@@ -16,7 +16,6 @@
 package net.ankio.auto.utils.server
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +27,6 @@ import net.ankio.auto.exceptions.AutoServiceException
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.event.EventBus
-import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.auto.utils.server.model.SettingModel
 import net.ankio.common.config.AccountingConfig
 import okhttp3.OkHttpClient

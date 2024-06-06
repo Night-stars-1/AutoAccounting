@@ -194,7 +194,7 @@ class EditFragment : BaseFragment() {
             var book = BookName.getByName(bookName)
 
             BookInfoDialog(requireActivity(), book) { type ->
-                CategorySelectorDialog(requireActivity(), book.id, type) { parent, child ->
+                CategorySelectorDialog(requireActivity(), book.relateId, type) { parent, child ->
                     val string: String =
                         if (parent == null) {
                             "其他"

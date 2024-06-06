@@ -267,7 +267,7 @@ class HomeFragment : BaseFragment() {
         binding.readCategory.setOnClickListener {
             BookSelectorDialog(themeContext) {
                 BookInfoDialog(themeContext, it) { type ->
-                    CategorySelectorDialog(themeContext, it.id, type) { category1: Category?, category2: Category? ->
+                    CategorySelectorDialog(themeContext, it.relateId, type) { category1: Category?, category2: Category? ->
                         Logger.i("选择的分类是：${category1?.name ?: ""} - ${category2?.name ?: ""}")
                     }.show(cancel = true)
                 }.show(cancel = true)

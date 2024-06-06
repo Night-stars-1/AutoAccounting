@@ -41,7 +41,7 @@ import net.ankio.common.constant.BillType
  */
 class CategorySelectorDialog(
     private val context: Context,
-    private var book: Int = 0,
+    private var book: String = "",
     private val type: BillType = BillType.Expend,
     private val callback: (Category?, Category?) -> Unit,
 ) : BaseSheetDialog(context) {
@@ -118,7 +118,7 @@ class CategorySelectorDialog(
     ): Category {
         val category = Category()
         category.remoteId = "-9999"
-        category.parent = item.id
+        category.parent = item.relateId
         category.book = book
         category.type = type.value
         val location = IntArray(2)
@@ -226,7 +226,7 @@ class CategorySelectorDialog(
 
         // 从数据库加载类别
         lifecycleScope.launch {
-            val newData = Category.getAll(book, type.toInt(), -1)
+            val newData = Category.getAll(book, type.toInt(), "-1")
             val defaultCategory = Category()
             defaultCategory.name = "其他"
             val collection =
