@@ -191,7 +191,7 @@ class EditFragment : BaseFragment() {
 
     private fun onClickCategory(it2: FlowElement) {
         lifecycleScope.launch {
-            var book = BookName.getByName(bookName)
+            val book = BookName.getByName(bookName)
 
             BookInfoDialog(requireActivity(), book) { type ->
                 CategorySelectorDialog(requireActivity(), book.relateId, type) { parent, child ->

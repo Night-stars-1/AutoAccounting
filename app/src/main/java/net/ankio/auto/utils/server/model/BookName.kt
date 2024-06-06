@@ -15,9 +15,11 @@
 package net.ankio.auto.utils.server.model
 
 import android.content.Context
+import android.util.Log
 import android.widget.ImageView
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import kotlinx.coroutines.launch
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
@@ -49,21 +51,27 @@ class BookName {
             }
         }
 
-        suspend fun getOne(): BookName? {
+        private suspend fun getOne(): BookName? {
             val data = AppUtils.getService().sendMsg("book/get/one", null)
-            return runCatching { Gson().fromJson(data as String, BookName::class.java) }.getOrNull()
+            return runCatching { Gson().fromJson(Gson().toJson(data), BookName::class.java) }.getOrNull()
         }
 
         suspend fun getByName(name: String): BookName {
             val data = AppUtils.getService().sendMsg("book/get/name", mapOf("name" to name))
-            return runCatching { Gson().fromJson(data as String, BookName::class.java) }.getOrNull()
-                ?: BookName().apply { this.name = name }
+            return if (data !is JsonNull) {
+                Gson().fromJson(Gson().toJson(data), BookName::class.java)
+            } else {
+                BookName().apply { this.name = name }
+            }
         }
 
         suspend fun get(): List<BookName> {
             val data = AppUtils.getService().sendMsg("book/get/all", null)
-            return runCatching { Gson().fromJson(data as JsonArray, Array<BookName>::class.java).toList() }
-                .getOrNull() ?: emptyList()
+            return if (data !is JsonNull) {
+                Gson().fromJson(data as JsonArray, Array<BookName>::class.java).toList()
+            } else {
+                emptyList()
+            }
         }
 
         suspend fun remove(name: String) {

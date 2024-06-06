@@ -237,8 +237,10 @@ class CategorySelectorAdapter(
                             adapter.notifyDataSetChanged()
                         }
                     } else {
-                        items.clear()
-                        adapter.notifyDataSetChanged()
+                        withContext(Dispatchers.Main) {
+                            items.clear()
+                            adapter.notifyDataSetChanged()
+                        }
                     }
                 }
             }
