@@ -15,6 +15,7 @@
 
 package net.ankio.auto.ui.dialog
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -48,6 +49,7 @@ class BillMoreDialog(
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun show(
         float: Boolean,
         cancel: Boolean,

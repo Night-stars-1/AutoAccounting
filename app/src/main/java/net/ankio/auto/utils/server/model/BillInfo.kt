@@ -73,7 +73,7 @@ class BillInfo {
     /**
      * 账本名称
      */
-    var bookName: String = "默认账本"
+    var bookName: String = ""
 
     /**
      * 账单所属资产名称（或者转出账户）

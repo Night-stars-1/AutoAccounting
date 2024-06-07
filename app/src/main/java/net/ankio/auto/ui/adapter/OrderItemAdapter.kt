@@ -28,7 +28,7 @@ import net.ankio.auto.utils.server.model.Assets
 import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.auto.utils.server.model.BookName
 import net.ankio.auto.utils.server.model.Category
-import net.ankio.common.config.AccountingConfig
+import net.ankio.common.model.AccountingConfig
 import net.ankio.common.constant.BillType
 
 class OrderItemAdapter(

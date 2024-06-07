@@ -23,6 +23,9 @@ import kotlinx.coroutines.launch
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
+import net.ankio.auto.utils.SpUtils
+import net.ankio.common.config.Config
+import net.ankio.common.model.AccountingConfig
 
 class BookName {
     /**
@@ -75,15 +78,20 @@ class BookName {
         }
 
         suspend fun getDefaultBook(bookName: String): BookName {
-            if (bookName == "默认账本") {
+            val localBookName = if (Config.multiBooks) {
+                SpUtils.getString("defaultBook", "默认账本")
+            } else {
+                bookName
+            }
+            if (localBookName == "默认账本") {
                 var book = getOne()
                 if (book == null) {
                     book = BookName()
-                    book.name = bookName
+                    book.name = localBookName
                 }
                 return book
             } else {
-                return getByName(bookName)
+                return getByName(localBookName )
             }
         }
 
