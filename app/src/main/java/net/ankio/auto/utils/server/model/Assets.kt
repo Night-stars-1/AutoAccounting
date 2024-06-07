@@ -56,7 +56,11 @@ class Assets {
 
         suspend fun getByName(name: String): Assets? {
             val data = AppUtils.getService().sendMsg("asset/get/name", mapOf("name" to name))
-            return runCatching { Gson().fromJson(data as String, Assets::class.java) }.getOrNull()
+            return if (data !is JsonNull) {
+                Gson().fromJson(Gson().toJson(data), Assets::class.java)
+            } else {
+                null
+            }
         }
 
         suspend fun remove(name: String) {
