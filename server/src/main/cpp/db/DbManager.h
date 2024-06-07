@@ -80,7 +80,7 @@ public:
     void removeBookName(const std::string& name);
 
     //分类
-    int insertCate(const std::string& id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type);
+    void insertCate(const std::string& id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type);
     Json::Value getAllCate(const std::string& parent = 0,const std::string& book = "", int type = 0);
     Json::Value getBookAllCate(const std::string& book = "");
     Json::Value getCate(const std::string& book,const std::string& cateName,int type);
@@ -97,7 +97,7 @@ public:
     void insertRule( const std::string& app, const std::string&  js, const std::string&  version,  int type);
     Json::Value getRule(const std::string& app, int type);
 
-    Json::Value buildBill(sqlite3_stmt *stmt);
+    static static Json::Value buildBill(sqlite3_stmt *stmt);
 
     Json::Value getBillAllParents();
 

@@ -319,9 +319,9 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         else if(message_type == "rule/put"){
             std::string app = data["app"].asString();
             std::string js = data["js"].asString();
-            std::string version = data["version"].asString();
+            std::string _version = data["version"].asString();
             int _type = data["type"].asInt();
-            DbManager::getInstance().insertRule(app, js, version, _type);
+            DbManager::getInstance().insertRule(app, js, _version, _type);
         } else if(message_type == "rule/get"){
             std::string app = data["app"].asString();
             int _type = data["type"].asInt();
