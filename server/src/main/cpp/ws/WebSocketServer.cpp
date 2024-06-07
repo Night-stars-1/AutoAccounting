@@ -208,7 +208,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
 
         else if(message_type == "asset/put"){
-            int id = data["id"].asInt();
+            std::string id = data["id"].asString();
             std::string name = data["name"].asString();
             int _type = data["type"].asInt();
             int sort = data["sort"].asInt();
@@ -230,21 +230,20 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string name = data["name"].asString();
             std::string mapName = data["mapName"].asString();
             int regex = data["regex"].asInt();
-            DbManager::getInstance().insertAssetMap(id,name, mapName, regex);
+            DbManager::getInstance().insertAssetMap(id, name, mapName, regex);
         } else if(message_type == "asset/map/get"){
             ret["data"]=DbManager::getInstance().getAssetMap();
         } else if(message_type == "asset/map/remove"){
-            int id = data["id"].asInt();
+            std::string id = data["id"].asString();
             DbManager::getInstance().removeAssetMap(id);
         }
 
 
         else if(message_type == "book/put"){
-            int id = data["id"].asInt();
+            std::string id = data["id"].asString();
             std::string name = data["name"].asString();
             std::string icon = data["icon"].asString();
-            std::string relateId = data["relateId"].asString();
-            DbManager::getInstance().insertBookName(id, name, icon, relateId);
+            DbManager::getInstance().insertBookName(id, name, icon);
         } else if(message_type == "book/get/one"){
             ret["data"] = DbManager::getInstance().getOneBookName();
         } else if(message_type == "book/get/name"){
@@ -266,7 +265,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         }
 
         else if(message_type == "cate/put"){
-            int id = data["id"].asInt();
+            std::string id = data["id"].asString();
             std::string name = data["name"].asString();
             std::string icon = data["icon"].asString();
             std::string remoteId = data["remoteId"].asString();
@@ -274,8 +273,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string book = data["book"].asString();
             int sort = data["sort"].asInt();
             int _type = data["type"].asInt();
-            std::string relateId = data["relateId"].asString();
-            DbManager::getInstance().insertCate(id, name, icon, remoteId, parent, book, sort, _type, relateId);
+            DbManager::getInstance().insertCate(id, name, icon, remoteId, parent, book, sort, _type);
         } else if(message_type == "cate/get/all"){
             std::string book = data["book"].asString();
             int _type = data["type"].asInt();
@@ -294,7 +292,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string remoteId = data["remoteId"].asString();
             ret["data"] = DbManager::getInstance().getCateByRemote(book, remoteId);
         } else if(message_type == "cate/remove"){
-            int id = data["id"].asInt();
+            std::string id = data["id"].asString();
             DbManager::getInstance().removeAssetMap(id);
         }
 

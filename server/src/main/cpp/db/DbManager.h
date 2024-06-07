@@ -62,7 +62,7 @@ public:
     void deleteAllAppData();
 
     //资产
-    void insertAsset(int id, const std::string& name, int type, int sort, const std::string&  icon, const std::string&  extra);
+    void insertAsset(const std::string& id, const std::string& name, int type, int sort, const std::string&  icon, const std::string& extra);
     Json::Value getAsset(int limit);
     Json::Value getAssetByName(const std::string& name);
     void removeAsset(std::string& name);
@@ -70,22 +70,22 @@ public:
     //资产映射
     void insertAssetMap(int id, const std::string& name, const std::string&  mapName, int regex);
     Json::Value getAssetMap();
-    void removeAssetMap(int id);
+    void removeAssetMap(const std::string& id);
 
     //BookName
-    void insertBookName(int id, const std::string& name, const std::string& icon, const std::string& relateId);
+    void insertBookName(const std::string& id, const std::string& name, const std::string& icon);
     Json::Value getOneBookName();
     Json::Value getBookName(const std::string& name);
     Json::Value getBookName();
     void removeBookName(const std::string& name);
 
     //分类
-    int insertCate(int id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type, const std::string& relateId);
+    int insertCate(const std::string& id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type);
     Json::Value getAllCate(const std::string& parent = 0,const std::string& book = "", int type = 0);
     Json::Value getBookAllCate(const std::string& book = "");
     Json::Value getCate(const std::string& book,const std::string& cateName,int type);
     Json::Value getCateByRemote(const std::string& book,const std::string& remoteId);
-    void removeCate(int id);
+    void removeCate(const std::string& id);
 
     //自定义分类规则
     void insertCustomRule(int id, const std::string& js, const std::string&  text, const std::string&  element, int use,int sort,int _auto);
