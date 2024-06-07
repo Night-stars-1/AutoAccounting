@@ -23,6 +23,7 @@ import com.hjq.toast.Toaster
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ankio.auto.App
+import net.ankio.auto.App.Companion.context
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
@@ -136,7 +137,7 @@ class UpdateUtils(private val showResult: Boolean = true) {
                 return null
             }
         }
-        val ruleVersion = SettingModel.getInt(App.appContext.packageName, "ruleVersion")
+        val ruleVersion = SettingModel.getInt(context.packageName, "ruleVersion")
         return request(
             "$ruleUrl/index.json",
             ruleVersion,

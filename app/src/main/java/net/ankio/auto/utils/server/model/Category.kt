@@ -24,7 +24,10 @@ import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
 
 class Category {
-    var id = 0
+    /**
+     * 关联id
+     */
+    var id: String = "0"
 
     /**
      * 分类名称
@@ -61,11 +64,6 @@ class Category {
 
      */
     var type: Int = 0
-
-    /**
-     * 关联id
-     */
-    var relateId: String = ""
 
     companion object {
         suspend fun getDrawable(

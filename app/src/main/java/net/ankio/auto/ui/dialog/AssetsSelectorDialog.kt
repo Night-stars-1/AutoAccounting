@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import net.ankio.auto.R
 import net.ankio.auto.databinding.DialogBookSelectBinding
 import net.ankio.auto.ui.adapter.AssetsSelectorAdapter
+import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.server.model.Assets
 
 class AssetsSelectorDialog(private val context: Context, private val callback: (Assets) -> Unit) :
@@ -60,7 +61,7 @@ class AssetsSelectorDialog(private val context: Context, private val callback: (
             val collection = newData.takeIf { it.isNotEmpty() } ?: listOf()
 
             if (collection.isEmpty()) {
-                Toaster.show(R.string.no_assets)
+                ToastUtil.toast(R.string.no_assets)
                 return@launch
             }
             super.show(float, cancel)

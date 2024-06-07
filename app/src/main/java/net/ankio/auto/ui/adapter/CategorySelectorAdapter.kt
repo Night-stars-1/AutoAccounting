@@ -216,7 +216,7 @@ class CategorySelectorAdapter(
          */
         @SuppressLint("NotifyDataSetChanged")
         fun updatePanel(item: Category) {
-            val leftDistanceView2: Int = item.id
+            val leftDistanceView2: Int = 0 // item.id
             val layoutParams = binding.imageView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.leftMargin = leftDistanceView2 // 设置左边距
             scope.launch {

@@ -17,6 +17,7 @@ package net.ankio.auto.utils.server.model
 import android.content.Context
 import android.graphics.drawable.Drawable
 import com.google.gson.Gson
+import com.google.gson.JsonNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,7 +27,7 @@ import net.ankio.auto.utils.ImageUtils
 
 class Assets {
     // 账户列表
-    var id = 0
+    var id: String = "0"
     var name: String = "" // 账户名
 
     /**
@@ -46,7 +47,11 @@ class Assets {
 
         suspend fun get(limit: Int = 500): List<Assets> {
             val data = AppUtils.getService().sendMsg("asset/get", mapOf("limit" to limit))
-            return Gson().fromJson(Gson().toJson(data), Array<Assets>::class.java).toList()
+            return if (data !is JsonNull) {
+                Gson().fromJson(Gson().toJson(data), Array<Assets>::class.java).toList()
+            } else {
+                emptyList()
+            }
         }
 
         suspend fun getByName(name: String): Assets? {

@@ -51,7 +51,7 @@ import java.util.Calendar
 class EditFragment : BaseFragment() {
     private lateinit var binding: FragmentEditBinding
     private var regular: Regular = Regular()
-    private var book: Int = 0
+    private var book: String = "0"
     private var bookName: String = ""
     private var category: String = ""
     private var list: MutableList<HashMap<String, Any>>? = mutableListOf()
@@ -98,16 +98,9 @@ class EditFragment : BaseFragment() {
             return
         }
         // 最后一个是数据
-        val lastElement = list!!.removeLast()
+        val lastElement = list.removeLast()
         // fix #7 因为存储的时候使用的是hashmap<String,Any>，反向识别的时候可能会将Int类型识别为Double
-        book =
-            if (lastElement["id"] is Int) {
-                lastElement["id"] as Int
-            } else if (lastElement["id"] is Double) {
-                (lastElement["id"] as Double).toInt()
-            } else {
-                0
-            }
+        book = lastElement["id"] as String
         bookName = lastElement["book"] as String
         category = lastElement["category"] as String
 
@@ -194,7 +187,7 @@ class EditFragment : BaseFragment() {
             val book = BookName.getByName(bookName)
 
             BookInfoDialog(requireActivity(), book) { type ->
-                CategorySelectorDialog(requireActivity(), book.relateId, type) { parent, child ->
+                CategorySelectorDialog(requireActivity(), book.id, type) { parent, child ->
                     val string: String =
                         if (parent == null) {
                             "其他"

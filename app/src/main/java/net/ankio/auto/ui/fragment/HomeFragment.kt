@@ -20,7 +20,6 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -244,6 +243,15 @@ class HomeFragment : BaseFragment() {
         binding.bookAppContainer.setOnClickListener {
             CustomTabsHelper.launchUrlOrCopy(requireContext(), getString(R.string.book_app_url))
         }
+        // 账本数据（只读）
+        binding.defaultBook.setOnClickListener {
+            BookSelectorDialog(themeContext) {
+                Logger.d("选择的账本是：${it.name}")
+                // defaultBook
+                SpUtils.putString("defaultBook", it.name)
+                binding.defaultBook.text = it.name
+            }.show(cancel = true)
+        }
         // 资产映射
         binding.map.setOnClickListener {
             // 切换到MapFragment
@@ -255,19 +263,11 @@ class HomeFragment : BaseFragment() {
                 Logger.i("选择的资产是：${it.name}")
             }.show(cancel = true)
         }
-        // 账本数据（只读）
-        binding.defaultBook.setOnClickListener {
-            BookSelectorDialog(themeContext) {
-                Logger.d("选择的账本是：${it.name}")
-                // defaultBook
-                SpUtils.putString("defaultBook", it.name)
-            }.show(cancel = true)
-        }
         // 分类数据（只读）
         binding.readCategory.setOnClickListener {
             BookSelectorDialog(themeContext) {
                 BookInfoDialog(themeContext, it) { type ->
-                    CategorySelectorDialog(themeContext, it.relateId, type) { category1: Category?, category2: Category? ->
+                    CategorySelectorDialog(themeContext, it.id, type) { category1: Category?, category2: Category? ->
                         Logger.i("选择的分类是：${category1?.name ?: ""} - ${category2?.name ?: ""}")
                     }.show(cancel = true)
                 }.show(cancel = true)

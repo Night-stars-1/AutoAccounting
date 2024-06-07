@@ -15,7 +15,6 @@
 package net.ankio.auto.utils.server.model
 
 import android.content.Context
-import android.util.Log
 import android.widget.ImageView
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -26,8 +25,10 @@ import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
 
 class BookName {
-    // 账本列表
-    var id: Int = 0
+    /**
+     * id
+     */
+    var id: String = "0"
 
     /**
      * 账户名
@@ -38,11 +39,6 @@ class BookName {
      * 图标是url或base64编码字符串
      */
     var icon: String = "" // 图标
-
-    /**
-     * 关联id
-     */
-    var relateId: String = ""
 
     companion object {
         fun put(book: BookName) {

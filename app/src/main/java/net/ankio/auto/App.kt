@@ -15,6 +15,7 @@
 
 package net.ankio.auto
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import com.hjq.toast.Toaster
@@ -24,9 +25,8 @@ import net.ankio.auto.utils.ExceptionHandler
 
 class App : Application() {
     companion object {
-        @JvmStatic
-        lateinit var appContext: Context
-            private set
+        @SuppressLint("StaticFieldLeak")
+        lateinit var context: Context
     }
 
     override fun onTerminate() {
@@ -50,7 +50,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appContext = applicationContext // 初始化全局 Context
+        context = applicationContext // 初始化全局 Context
        /* if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()

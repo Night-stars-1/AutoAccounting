@@ -19,14 +19,15 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import net.ankio.auto.App
+import net.ankio.auto.App.Companion.context
 
 object ToastUtil {
     fun toast(msg: String) {
         Handler(Looper.getMainLooper()).post {
-            Toast.makeText(App.appContext, msg, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
     fun toast(resId: Int) {
-        Toast.makeText(App.appContext, App.appContext.getString(resId), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show()
     }
 }

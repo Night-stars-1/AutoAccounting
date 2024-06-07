@@ -118,14 +118,14 @@ class CategorySelectorDialog(
     ): Category {
         val category = Category()
         category.remoteId = "-9999"
-        category.parent = item.relateId
+        category.parent = item.id
         category.book = book
         category.type = type.value
         val location = IntArray(2)
         view.getLocationOnScreen(location)
         val params = view.layoutParams as MarginLayoutParams
         val leftDistanceWithMargin = location[0] + view.paddingLeft + params.leftMargin - 40
-        category.id = leftDistanceWithMargin - view.width / 2
+        category.id = (leftDistanceWithMargin - view.width / 2).toString()
         return category
     }
 

@@ -54,7 +54,7 @@ class BookSelectorDialog(private val context: Context, val callback: (BookName) 
         val defaultBook =
             BookName().apply {
                 name = SpUtils.getString("defaultBook", "默认账本")
-                id = 0
+                id = "0"
             }
 
         lifecycleScope.launch {
