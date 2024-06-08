@@ -19,8 +19,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import net.ankio.auto.service.FloatingWindowService
+import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
+import net.ankio.auto.utils.server.AutoServer
 
 class FloatingWindowTriggerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +48,9 @@ class FloatingWindowTriggerActivity : AppCompatActivity() {
                 Intent(this, FloatingWindowService::class.java).apply {
                     putExtra("data", dataValue)
                 }
+            lifecycleScope.launch {
+                AppUtils.getService().config()
+            }
             startService(serviceIntent)
             // 关闭 Activity
             exitActivity()

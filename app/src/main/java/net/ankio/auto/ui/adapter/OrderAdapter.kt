@@ -60,14 +60,12 @@ class OrderAdapter(
             OrderItemAdapter(
                 dataInnerItems,
                 onItemChildClick = { itemBill ->
-                    Logger.i("onItemChildClick1")
                     holder.scope.launch {
-                        Logger.i("onItemChildClick2")
                         FloatEditorDialog(context, itemBill, config, onlyShow = true){ billInfo ->
                             val position1 = dataInnerItems.indexOfFirst { it.id == billInfo.id }
                             if (position1 != -1) {
                                 dataInnerItems[position1].remark = billInfo.remark
-                                notifyItemChanged(position1)
+                                binding.recyclerView.adapter?.notifyItemChanged(position1)
                             }
                         }.show(float=false, cancel=true)
                     }
