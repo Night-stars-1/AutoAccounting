@@ -23,6 +23,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -81,6 +82,11 @@ class CategorySelectorAdapter(
         }
     }
 
+
+    override fun wrapHolder(viewBinding: ViewBinding): BaseViewHolder {
+        return ViewHolder(viewBinding as AdapterCategoryListBinding)
+    }
+
     private var itemTextView: TextView? = null
     private var itemImageIcon: ImageView? = null
     private var ivMore: ImageView? = null
@@ -91,9 +97,10 @@ class CategorySelectorAdapter(
      */
     inner class ViewHolder(
         override val binding: AdapterCategoryListBinding,
-        val context: Context,
-    ) : BaseViewHolder(binding) {
+    ) : BaseViewHolder(binding)
+    {
         private lateinit var adapter: CategorySelectorAdapter
+        val context: Context = binding.root.context
 
         /**
          * 设置激活状态

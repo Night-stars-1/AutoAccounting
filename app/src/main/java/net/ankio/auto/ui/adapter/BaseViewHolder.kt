@@ -15,7 +15,6 @@
 
 package net.ankio.auto.ui.adapter
 
-import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.CoroutineScope

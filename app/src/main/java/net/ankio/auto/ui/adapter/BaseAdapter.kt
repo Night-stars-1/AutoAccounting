@@ -24,6 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
 abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindingClazz: Class<*>) : RecyclerView.Adapter<BaseViewHolder>() {
+    open fun wrapHolder(viewBinding: ViewBinding): BaseViewHolder {
+        return BaseViewHolder(viewBinding)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -38,7 +41,7 @@ abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindin
                 Boolean::class.java,
             )
         val viewBinding = inflateMethod.invoke(null, LayoutInflater.from(parent.context), parent, false) as ViewBinding
-        return BaseViewHolder(viewBinding)
+        return wrapHolder(viewBinding)
     }
 
     override fun getItemCount(): Int {
