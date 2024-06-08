@@ -22,19 +22,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-open class BaseViewHolder(open val binding: ViewBinding, open val context: Context) : RecyclerView.ViewHolder(binding.root) {
-    private lateinit var job: Job
-    lateinit var scope: CoroutineScope
-    var hasInit = false
-    var item: Any? = null
+open class BaseViewHolder(open val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
+    private val job = Job()
+    val scope = CoroutineScope(Dispatchers.Main + job)
 
-    fun createScope() {
-        cancelScope()
-        job = Job()
-        scope = CoroutineScope(Dispatchers.Main + job)
-    }
-
-    fun cancelScope() {
-        if (::job.isInitialized && !job.isCancelled) job.cancel()
+    fun cleanUp() {
+        if (!job.isCancelled) job.cancel()
     }
 }

@@ -62,13 +62,12 @@ class OrderItemAdapter(
     ) {
         val binding = holder.binding as AdapterOrderItemBinding
         val item = dataItems[position]
-        Logger.i("onBindViewHolder $item")
         val context = holder.itemView.context
 
         onInitView(holder, item)
 
         binding.category.setText(item.cateName)
-        scope.launch {
+        holder.scope.launch {
             val book = BookName.getDefaultBook(item.bookName)
             Category.getDrawable(item.cateName, book.id, context).let {
                 withContext(Dispatchers.Main) {
@@ -111,7 +110,7 @@ class OrderItemAdapter(
 
         binding.payTools.setText(item.accountNameFrom)
 
-        scope.launch {
+        holder.scope.launch {
             Assets.getDrawable(item.accountNameFrom, context).let {
                 binding.payTools.setIcon(it, false)
             }

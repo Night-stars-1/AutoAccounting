@@ -33,7 +33,7 @@ class BookSelectorAdapter(
             onClick(item)
         }
 
-        scope.launch {
+        holder.scope.launch {
             ImageUtils.get(holder.itemView.context, item.icon, R.drawable.default_book).let {
                 binding.book.background = it
             }

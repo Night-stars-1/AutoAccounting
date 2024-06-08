@@ -36,7 +36,7 @@ class MapAdapter(
         onInitView(holder, item)
 
         // 图片加载丢到IO线程
-        scope.launch {
+        holder.scope.launch {
             Assets.getDrawable(item.mapName, context).let { drawable ->
                 binding.target.setIcon(drawable)
             }

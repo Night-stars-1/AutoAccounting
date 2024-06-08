@@ -23,11 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindingClazz: Class<*>) : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>() {
-    open inner class BaseViewHolder(open val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
-
-    private val job = Job()
-    protected val scope = CoroutineScope(Dispatchers.Main + job)
+abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindingClazz: Class<*>) : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -55,6 +51,6 @@ abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindin
 
     override fun onViewDetachedFromWindow(holder: BaseViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        if (!job.isCancelled) job.cancel()
+        holder.cleanUp()
     }
 }

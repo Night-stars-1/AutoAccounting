@@ -21,6 +21,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.elevation.SurfaceColors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankio.auto.R
 import net.ankio.auto.app.js.Engine
@@ -110,12 +111,11 @@ class DataAdapter(
             binding.uploadData.visibility = View.GONE
             binding.issue.text = "# ${item.issue}"
         }
-        /*
-        作用未知
+
         holder.scope.launch {
-            tryAdaptUnmatchedItems(holder, this@DataAdapter)
+            tryAdaptUnmatchedItems(holder, this@DataAdapter, item)
         }
-         */
+
         val app = AppUtils.getAppInfoFromPackageName(item.source, context)
 
         binding.app.text =
@@ -161,28 +161,28 @@ class DataAdapter(
 
     private val hashMap = HashMap<AppData, Long>()
 
-//    private suspend fun tryAdaptUnmatchedItems(
-//        holder: BaseViewHolder,
-//        adapter: DataAdapter,
-//    ) = withContext(Dispatchers.IO) {
-//        val item = holder.item as AppData
-//        if (item.match != 1) {
-//            val t = System.currentTimeMillis() / 1000
-//            if (hashMap.containsKey(item) && t - hashMap[item]!! < 30) { // 30秒内不重复匹配
-//                return@withContext
-//            }
-//            hashMap[item] = t
-//            val result = Engine.analyze(item.type, item.source, item.data)
-//            if (result != null) {
-//                item.rule = result.channel
-//                item.match = 1
-//                withContext(Dispatchers.Main) {
-//                    val index = getHolderIndex(holder)
-//                    dataItems[index] = item
-//                    adapter.notifyItemChanged(index)
-//                }
-//                AppData.put(item)
-//            }
-//        }
-//    }
+    private suspend fun tryAdaptUnmatchedItems(
+        holder: BaseViewHolder,
+        adapter: DataAdapter,
+        item: AppData
+    ) = withContext(Dispatchers.IO) {
+        if (item.match != 1) {
+            val t = System.currentTimeMillis() / 1000
+            if (hashMap.containsKey(item) && t - hashMap[item]!! < 30) { // 30秒内不重复匹配
+                return@withContext
+            }
+            hashMap[item] = t
+            val result = Engine.analyze(item.type, item.source, item.data)
+            if (result != null) {
+                item.rule = result.channel
+                item.match = 1
+                withContext(Dispatchers.Main) {
+                    val index = dataItems.indexOf(item)
+                    dataItems[index] = item
+                    adapter.notifyItemChanged(index)
+                }
+                AppData.put(item)
+            }
+        }
+    }
 }

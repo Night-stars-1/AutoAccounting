@@ -34,7 +34,7 @@ class AssetsSelectorAdapter(
             onClick(item)
         }
 
-        scope.launch {
+        holder.scope.launch {
             ImageUtils.get(holder.itemView.context, item.icon, R.drawable.default_cate).let {
                 binding.assets.setIcon(it)
             }

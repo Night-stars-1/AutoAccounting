@@ -18,6 +18,7 @@ package net.ankio.auto.ui.adapter
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.elevation.SurfaceColors
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.ankio.auto.databinding.AdapterOrderBinding
 import net.ankio.auto.ui.dialog.BillMoreDialog
@@ -59,7 +60,10 @@ class OrderAdapter(
             OrderItemAdapter(
                 dataInnerItems,
                 onItemChildClick = { itemBill ->
-                    scope.launch {
+                    Logger.i("onItemChildClick1")
+                    Logger.i(scope.isActive.toString())
+                    holder.scope.launch {
+                        Logger.i("onItemChildClick2")
                         FloatEditorDialog(context, itemBill, config, onlyShow = true){ billInfo ->
                             val position1 = dataInnerItems.indexOfFirst { it.id == billInfo.id }
                             if (position1 != -1) {
