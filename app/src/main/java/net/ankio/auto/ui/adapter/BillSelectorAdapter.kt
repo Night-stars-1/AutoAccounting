@@ -28,10 +28,16 @@ class BillSelectorAdapter(
     override val dataItems: List<BillModel>,
     private val selectedItems: ArrayList<BillModel>,
 ) : BaseAdapter(dataItems, AdapterBillBookBinding::class.java) {
-    override fun onInitView(holder: BaseViewHolder) {
+
+    override fun onBindViewHolder(
+        holder: BaseViewHolder,
+        position: Int
+    ) {
+        val item = dataItems[position]
         val binding = holder.binding as AdapterBillBookBinding
+        val context = holder.itemView.context
+
         binding.root.setOnClickListener {
-            val item = holder.item as BillModel
             if (selectedItems.contains(item)) {
                 selectedItems.remove(item)
                 // 清除背景
@@ -41,15 +47,6 @@ class BillSelectorAdapter(
                 binding.root.setBackgroundColor(AppUtils.getThemeAttrColor(com.google.android.material.R.attr.colorPrimaryContainer))
             }
         }
-    }
-
-    override fun onBindView(
-        holder: BaseViewHolder,
-        item: Any,
-    ) {
-        val binding = holder.binding as AdapterBillBookBinding
-        val it = item as BillModel
-        val context = holder.context
 
         if (selectedItems.contains(item)) {
             binding.root.setBackgroundColor(AppUtils.getThemeAttrColor(com.google.android.material.R.attr.colorPrimaryContainer))

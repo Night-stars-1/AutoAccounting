@@ -38,12 +38,11 @@ class DataAdapter(
     private val onClickTest: (item: AppData) -> Unit,
     private val onClickUploadData: (item: AppData, pos: Int) -> Unit,
 ) : BaseAdapter(dataItems, AdapterDataBinding::class.java) {
-    override fun onInitView(holder: BaseViewHolder) {
+    private fun onInitView(holder: BaseViewHolder, item: AppData) {
         val binding = holder.binding as AdapterDataBinding
-        val context = holder.context
+        val context = holder.itemView.context
 
         binding.issue.setOnClickListener {
-            val item = holder.item as AppData
             CustomTabsHelper.launchUrl(
                 context,
                 Uri.parse(
@@ -53,7 +52,6 @@ class DataAdapter(
         }
 
         binding.testRule.setOnClickListener {
-            val item = holder.item as AppData
             onClickTest(item)
         }
         binding.content.setOnClickListener {
@@ -61,27 +59,28 @@ class DataAdapter(
         }
 
         binding.uploadData.setOnClickListener {
-            val item = holder.item as AppData
-            onClickUploadData(item, getHolderIndex(holder))
+            onClickUploadData(item, dataItems.indexOf(item))
         }
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindView(
+    override fun onBindViewHolder(
         holder: BaseViewHolder,
-        item: Any,
+        position: Int,
     ) {
+        val item = dataItems[position]
         val binding = holder.binding as AdapterDataBinding
-        val appData = item as AppData
-        val context = holder.context
+        val context = holder.itemView.context
+
+        onInitView(holder, item)
 
         binding.groupCard.setCardBackgroundColor(SurfaceColors.SURFACE_1.getColor(context))
         binding.content.setBackgroundColor(SurfaceColors.SURFACE_3.getColor(context))
         // 格式化数据
-        val prettyJson: String = AppUtils.toPrettyFormat(appData.data)
+        val prettyJson: String = AppUtils.toPrettyFormat(item.data)
 
         binding.content.text = prettyJson
-        when (appData.type.toDataType()) {
+        when (item.type.toDataType()) {
             DataType.Notice -> {
                 binding.type.setColorFilter(ContextCompat.getColor(context, R.color.warning))
                 binding.type.setImageResource(R.drawable.data_notice)
@@ -105,11 +104,11 @@ class DataAdapter(
         binding.issue.visibility = View.VISIBLE
         binding.uploadData.visibility = View.VISIBLE
 
-        if (appData.issue == 0) {
+        if (item.issue == 0) {
             binding.issue.visibility = View.GONE
         } else {
             binding.uploadData.visibility = View.GONE
-            binding.issue.text = "# ${appData.issue}"
+            binding.issue.text = "# ${item.issue}"
         }
         /*
         作用未知
@@ -162,28 +161,28 @@ class DataAdapter(
 
     private val hashMap = HashMap<AppData, Long>()
 
-    private suspend fun tryAdaptUnmatchedItems(
-        holder: BaseViewHolder,
-        adapter: DataAdapter,
-    ) = withContext(Dispatchers.IO) {
-        val item = holder.item as AppData
-        if (item.match != 1) {
-            val t = System.currentTimeMillis() / 1000
-            if (hashMap.containsKey(item) && t - hashMap[item]!! < 30) { // 30秒内不重复匹配
-                return@withContext
-            }
-            hashMap[item] = t
-            val result = Engine.analyze(item.type, item.source, item.data)
-            if (result != null) {
-                item.rule = result.channel
-                item.match = 1
-                withContext(Dispatchers.Main) {
-                    val index = getHolderIndex(holder)
-                    dataItems[index] = item
-                    adapter.notifyItemChanged(index)
-                }
-                AppData.put(item)
-            }
-        }
-    }
+//    private suspend fun tryAdaptUnmatchedItems(
+//        holder: BaseViewHolder,
+//        adapter: DataAdapter,
+//    ) = withContext(Dispatchers.IO) {
+//        val item = holder.item as AppData
+//        if (item.match != 1) {
+//            val t = System.currentTimeMillis() / 1000
+//            if (hashMap.containsKey(item) && t - hashMap[item]!! < 30) { // 30秒内不重复匹配
+//                return@withContext
+//            }
+//            hashMap[item] = t
+//            val result = Engine.analyze(item.type, item.source, item.data)
+//            if (result != null) {
+//                item.rule = result.channel
+//                item.match = 1
+//                withContext(Dispatchers.Main) {
+//                    val index = getHolderIndex(holder)
+//                    dataItems[index] = item
+//                    adapter.notifyItemChanged(index)
+//                }
+//                AppData.put(item)
+//            }
+//        }
+//    }
 }

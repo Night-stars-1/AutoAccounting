@@ -23,7 +23,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,6 +43,28 @@ class CategorySelectorAdapter(
     private val onItemClick: (item: Category, pos: Int, hasChild: Boolean, view: View) -> Unit,
     private val onItemChildClick: (item: Category, pos: Int) -> Unit,
 ) : BaseAdapter(dataItems, AdapterCategoryListBinding::class.java) {
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        val item = dataItems[position]
+        val viewHolder = holder as ViewHolder
+        val binding = viewHolder.binding
+
+        binding.itemImageIcon.setOnClickListener {
+            if (itemTextView != null) {
+                viewHolder.setActive(itemTextView!!, itemImageIcon!!, ivMore!!, false)
+            }
+            viewHolder.setActive(binding.itemText, binding.itemImageIcon, binding.ivMore, true)
+
+            itemTextView = binding.itemText
+            itemImageIcon = binding.itemImageIcon
+            ivMore = binding.ivMore
+
+            onItemClick(item, dataItems.indexOf(item), binding.ivMore.visibility == View.VISIBLE, it)
+        }
+
+        viewHolder.bind(item)
+    }
+
     override fun onBindViewHolder(
         holder: BaseViewHolder,
         position: Int,
@@ -55,41 +76,9 @@ class CategorySelectorAdapter(
             // 如果有 payload，根据 payload 更新部分内容
             val category = payloads[0] as Category
             val viewHolder = holder as ViewHolder
-            viewHolder.item = category
+
             viewHolder.updatePanel(category)
         }
-    }
-
-    override fun onBindView(
-        holder: BaseViewHolder,
-        item: Any,
-    ) {
-        val it = item as Category
-        val viewHolder = holder as ViewHolder
-        viewHolder.bind(it)
-    }
-
-    override fun onInitView(holder: BaseViewHolder) {
-        val viewHolder = holder as ViewHolder
-
-        val binding = viewHolder.binding
-        binding.itemImageIcon.setOnClickListener {
-            if (itemTextView != null) {
-                viewHolder.setActive(itemTextView!!, itemImageIcon!!, ivMore!!, false)
-            }
-            viewHolder.setActive(binding.itemText, binding.itemImageIcon, binding.ivMore, true)
-
-            itemTextView = binding.itemText
-            itemImageIcon = binding.itemImageIcon
-            ivMore = binding.ivMore
-
-            val item = holder.item as Category
-            onItemClick(item, getHolderIndex(holder), binding.ivMore.visibility == View.VISIBLE, it)
-        }
-    }
-
-    override fun wrapHolder(viewBinding: ViewBinding): BaseViewHolder {
-        return ViewHolder(viewBinding as AdapterCategoryListBinding, viewBinding.root.context)
     }
 
     private var itemTextView: TextView? = null
@@ -99,12 +88,11 @@ class CategorySelectorAdapter(
     /**
      * ViewHolder内部类
      * @property binding 视图绑定
-     * @property context 上下文
      */
     inner class ViewHolder(
         override val binding: AdapterCategoryListBinding,
-        override val context: Context,
-    ) : BaseViewHolder(binding, context) {
+        val context: Context,
+    ) : BaseViewHolder(binding) {
         private lateinit var adapter: CategorySelectorAdapter
 
         /**
@@ -163,7 +151,7 @@ class CategorySelectorAdapter(
         /**
          * item渲染
          */
-        fun renderItem(item: Category) {
+        private fun renderItem(item: Category) {
             if (item.parent != "-1") {
                 binding.ivMore.visibility = View.GONE
             } else {
@@ -216,7 +204,7 @@ class CategorySelectorAdapter(
          */
         @SuppressLint("NotifyDataSetChanged")
         fun updatePanel(item: Category) {
-            val leftDistanceView2: Int = 0 // item.id
+            val leftDistanceView2 = 0 // item.id
             val layoutParams = binding.imageView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.leftMargin = leftDistanceView2 // 设置左边距
             scope.launch {

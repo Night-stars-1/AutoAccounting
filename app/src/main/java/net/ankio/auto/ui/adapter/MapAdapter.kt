@@ -25,16 +25,19 @@ class MapAdapter(
     private val onClick: (adapter: MapAdapter, item: AssetsMap, pos: Int) -> Unit,
     private val onLongClick: (adapter: MapAdapter, item: AssetsMap, pos: Int) -> Unit,
 ) : BaseAdapter(dataItems, AdapterMapBinding::class.java) {
-    override fun onBindView(
+    override fun onBindViewHolder(
         holder: BaseViewHolder,
-        item: Any,
+        position: Int
     ) {
         val binding = holder.binding as AdapterMapBinding
-        val it = item as AssetsMap
-        val context = holder.context
+        val item = dataItems[position]
+        val context = holder.itemView.context
+
+        onInitView(holder, item)
+
         // 图片加载丢到IO线程
-        holder.scope.launch {
-            Assets.getDrawable(it.mapName, context).let { drawable ->
+        scope.launch {
+            Assets.getDrawable(item.mapName, context).let { drawable ->
                 binding.target.setIcon(drawable)
             }
         }
@@ -43,18 +46,16 @@ class MapAdapter(
         binding.target.setText(item.mapName)
     }
 
-    override fun onInitView(holder: BaseViewHolder) {
+    private fun onInitView(holder: BaseViewHolder, item: AssetsMap) {
         val binding = holder.binding as AdapterMapBinding
 
         // 单击编辑
         binding.item.setOnClickListener {
-            val item = holder.item as AssetsMap
-            onClick(this@MapAdapter, item, getHolderIndex(holder))
+            onClick(this@MapAdapter, item, dataItems.indexOf(item))
         }
         // 长按删除
         binding.item.setOnLongClickListener {
-            val item = holder.item as AssetsMap
-            onLongClick(this@MapAdapter, item, getHolderIndex(holder))
+            onLongClick(this@MapAdapter, item, dataItems.indexOf(item))
             true
         }
     }

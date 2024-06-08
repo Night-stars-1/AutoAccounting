@@ -22,25 +22,30 @@ import kotlinx.coroutines.launch
 import net.ankio.auto.databinding.AdapterOrderBinding
 import net.ankio.auto.ui.dialog.BillMoreDialog
 import net.ankio.auto.ui.dialog.FloatEditorDialog
+import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.common.model.AccountingConfig
 
 class OrderAdapter(
     override val dataItems: ArrayList<Pair<String, Array<BillInfo>>>,
 ) : BaseAdapter(dataItems, AdapterOrderBinding::class.java) {
-    override fun onInitView(holder: BaseViewHolder) {
+
+    private fun onInitView(holder: BaseViewHolder) {
         val binding = holder.binding as AdapterOrderBinding
-        val context = holder.context
+        val context = holder.itemView.context
         binding.groupCard.setCardBackgroundColor(SurfaceColors.SURFACE_1.getColor(context))
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onBindView(
+    override fun onBindViewHolder(
         holder: BaseViewHolder,
-        item: Any,
+        position: Int
     ) {
         val binding = holder.binding as AdapterOrderBinding
-        val context = holder.context
+        val context = holder.itemView.context
+
+        onInitView(holder)
+
         val dataInnerItems = mutableListOf<BillInfo>()
         val layoutManager: LinearLayoutManager =
             object : LinearLayoutManager(context) {
@@ -54,16 +59,22 @@ class OrderAdapter(
             OrderItemAdapter(
                 dataInnerItems,
                 onItemChildClick = { itemBill ->
-                    holder.scope.launch {
-                        FloatEditorDialog(context, itemBill, config, onlyShow = true).show(false, true)
+                    scope.launch {
+                        FloatEditorDialog(context, itemBill, config, onlyShow = true){ billInfo ->
+                            val position1 = dataInnerItems.indexOfFirst { it.id == billInfo.id }
+                            if (position1 != -1) {
+                                dataInnerItems[position1].remark = billInfo.remark
+                                notifyItemChanged(position1)
+                            }
+                        }.show(float=false, cancel=true)
                     }
                 },
                 onItemChildMoreClick = { itemBill ->
-                    BillMoreDialog(context, itemBill).show(false, true)
+                    BillMoreDialog(context, itemBill).show(float=false, cancel=true)
                 },
             )
 
-        val items = item as Pair<String, Array<BillInfo>>
+        val items = dataItems[position]
 
         binding.recyclerView.adapter = adapter
         dataInnerItems.clear()

@@ -19,11 +19,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
-abstract class BaseAdapter(open val dataItems: List<Any>, val viewBindingClazz: Class<*>) : RecyclerView.Adapter<BaseViewHolder>() {
-    open fun wrapHolder(viewBinding: ViewBinding): BaseViewHolder {
-        return BaseViewHolder(viewBinding, viewBinding.root.context)
-    }
+abstract class BaseAdapter(open val dataItems: List<Any>, private val viewBindingClazz: Class<*>) : RecyclerView.Adapter<BaseAdapter.BaseViewHolder>() {
+    open inner class BaseViewHolder(open val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private val job = Job()
+    protected val scope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -38,44 +42,19 @@ abstract class BaseAdapter(open val dataItems: List<Any>, val viewBindingClazz: 
                 Boolean::class.java,
             )
         val viewBinding = inflateMethod.invoke(null, LayoutInflater.from(parent.context), parent, false) as ViewBinding
-        return wrapHolder(viewBinding)
+        return BaseViewHolder(viewBinding)
     }
 
     override fun getItemCount(): Int {
         return dataItems.size
     }
 
-    fun getHolderIndex(holder: BaseViewHolder): Int {
-        return dataItems.lastIndexOf(holder.item)
-    }
-
-    abstract fun onBindView(
-        holder: BaseViewHolder,
-        item: Any,
-    )
-
-    abstract fun onInitView(holder: BaseViewHolder)
-
-    override fun onBindViewHolder(
-        holder: BaseViewHolder,
-        position: Int,
-    ) {
-        holder.createScope()
-        val item = dataItems[position]
-        runCatching {
-            holder.item = item
-            if (!holder.hasInit) {
-                onInitView(holder)
-                holder.hasInit = true
-            }
-            onBindView(holder, item)
-        }.onFailure {
-            it.printStackTrace()
-        }
-    }
+//    fun getHolderIndex(holder: BaseViewHolder): Int {
+//        return dataItems.lastIndexOf(holder.item)
+//    }
 
     override fun onViewDetachedFromWindow(holder: BaseViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        holder.cancelScope()
+        if (!job.isCancelled) job.cancel()
     }
 }

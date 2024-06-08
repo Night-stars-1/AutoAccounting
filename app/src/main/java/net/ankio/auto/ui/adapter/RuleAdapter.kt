@@ -29,19 +29,20 @@ class RuleAdapter(
     private val onClickEdit: (item: Regular, pos: Int) -> Unit,
     private val onClickDelete: (item: Regular, pos: Int) -> Unit,
 ) : BaseAdapter(dataItems, AdapterRuleBinding::class.java) {
-    override fun onBindView(
+    override fun onBindViewHolder(
         holder: BaseViewHolder,
-        item: Any,
+        position: Int
     ) {
         val binding = holder.binding as AdapterRuleBinding
         val context = binding.root.context
-        val regular = item as Regular
+        val item = dataItems[position]
 
-        if (!regular.auto) {
+        onInitView(holder, item)
+        if (!item.auto) {
             binding.type.visibility = View.GONE
         }
         val listType = object : TypeToken<MutableList<HashMap<String, Any>>>() {}.type
-        val list: MutableList<HashMap<String, Any>> = Gson().fromJson(regular.element, listType) ?: return
+        val list: MutableList<HashMap<String, Any>> = Gson().fromJson(item.element, listType) ?: return
 
         val lastElement = list.removeLast()
         val flexboxLayout = binding.flexboxLayout
@@ -73,18 +74,16 @@ class RuleAdapter(
         flexboxLayout.appendWaveTextview(lastElement["category"] as String) { _, _ -> }
     }
 
-    override fun onInitView(holder: BaseViewHolder) {
+    fun onInitView(holder: BaseViewHolder, item: Regular) {
         val binding = holder.binding as AdapterRuleBinding
         val context = binding.root.context
 
         binding.groupCard.setCardBackgroundColor(SurfaceColors.SURFACE_1.getColor(context))
         binding.deleteData.setOnClickListener {
-            val item = holder.item as Regular
-            onClickDelete(item, getHolderIndex(holder))
+            onClickDelete(item, dataItems.indexOf(item))
         }
         binding.editRule.setOnClickListener {
-            val item = holder.item as Regular
-            onClickEdit(item, getHolderIndex(holder))
+            onClickEdit(item, dataItems.indexOf(item))
         }
     }
 }

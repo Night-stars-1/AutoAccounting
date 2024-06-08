@@ -25,24 +25,21 @@ class AssetsSelectorAdapter(
     override val dataItems: List<Assets>,
     private val onClick: (item: Assets) -> Unit,
 ) : BaseAdapter(dataItems, AdapterAssetsBinding::class.java) {
-    override fun onInitView(holder: BaseViewHolder) {
-        (holder.binding as AdapterAssetsBinding).assets.setOnClickListener {
-            onClick(holder.item as Assets)
-        }
-    }
 
-    override fun onBindView(
-        holder: BaseViewHolder,
-        item: Any,
-    ) {
-        val it = item as Assets
-        val binding = (holder.binding as AdapterAssetsBinding)
-        holder.scope.launch {
-            ImageUtils.get(holder.context, it.icon, R.drawable.default_cate).let {
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        val item = dataItems[position]
+        val binding = holder.binding as AdapterAssetsBinding
+
+        binding.assets.setOnClickListener {
+            onClick(item)
+        }
+
+        scope.launch {
+            ImageUtils.get(holder.itemView.context, item.icon, R.drawable.default_cate).let {
                 binding.assets.setIcon(it)
             }
         }
 
-        binding.assets.setText(it.name)
+        binding.assets.setText(item.name)
     }
 }

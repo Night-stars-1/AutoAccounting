@@ -24,6 +24,7 @@ import net.ankio.auto.app.BillUtils
 import net.ankio.auto.databinding.AdapterOrderItemBinding
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.DateUtils
+import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.server.model.Assets
 import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.auto.utils.server.model.BookName
@@ -32,17 +33,18 @@ import net.ankio.common.model.AccountingConfig
 import net.ankio.common.constant.BillType
 
 class OrderItemAdapter(
-    override val dataItems: List<BillInfo>,
+    override val dataItems: MutableList<BillInfo>,
     private val onItemChildClick: ((item: BillInfo) -> Unit)?,
     private val onItemChildMoreClick: ((item: BillInfo) -> Unit)?,
 ) : BaseAdapter(dataItems, AdapterOrderItemBinding::class.java) {
-    override fun onInitView(holder: BaseViewHolder) {
+
+    private fun onInitView(holder: BaseViewHolder, item: BillInfo) {
         val binding = holder.binding as AdapterOrderItemBinding
         binding.root.setOnClickListener {
-            onItemChildClick?.invoke(holder.item as BillInfo)
+            onItemChildClick?.invoke(item)
         }
         binding.moreBills.setOnClickListener {
-            onItemChildMoreClick?.invoke(holder.item as BillInfo)
+            onItemChildMoreClick?.invoke(item)
         }
 
         binding.payTools.visibility = if (config.assetManagement) View.VISIBLE else View.GONE
@@ -54,28 +56,31 @@ class OrderItemAdapter(
         config = autoAccountingConfig
     }
 
-    override fun onBindView(
+    override fun onBindViewHolder(
         holder: BaseViewHolder,
-        item: Any,
+        position: Int
     ) {
         val binding = holder.binding as AdapterOrderItemBinding
-        val billInfo = item as BillInfo
-        val scope = holder.scope
-        val context = holder.context
-        binding.category.setText(billInfo.cateName)
+        val item = dataItems[position]
+        Logger.i("onBindViewHolder $item")
+        val context = holder.itemView.context
+
+        onInitView(holder, item)
+
+        binding.category.setText(item.cateName)
         scope.launch {
-            val book = BookName.getDefaultBook(billInfo.bookName)
-            Category.getDrawable(billInfo.cateName, book.id, context).let {
+            val book = BookName.getDefaultBook(item.bookName)
+            Category.getDrawable(item.cateName, book.id, context).let {
                 withContext(Dispatchers.Main) {
                     binding.category.setIcon(it, true)
                 }
             }
         }
 
-        binding.date.text = DateUtils.getTime("HH:mm:ss", billInfo.timeStamp)
+        binding.date.text = DateUtils.getTime("HH:mm:ss", item.timeStamp)
 
         val type =
-            when (BillType.fromInt(billInfo.type)) {
+            when (BillType.fromInt(item.type)) {
                 BillType.Expend -> BillType.Expend
                 BillType.ExpendReimbursement -> BillType.Expend
                 BillType.ExpendLending -> BillType.Expend
@@ -100,14 +105,14 @@ class OrderItemAdapter(
         val color = ContextCompat.getColor(context, tintRes)
         binding.money.setColor(color)
 
-        binding.money.setText(symbols + billInfo.money.toString())
+        binding.money.setText(symbols + item.money.toString())
 
-        binding.remark.text = billInfo.remark
+        binding.remark.text = item.remark
 
-        binding.payTools.setText(billInfo.accountNameFrom)
+        binding.payTools.setText(item.accountNameFrom)
 
         scope.launch {
-            Assets.getDrawable(billInfo.accountNameFrom, context).let {
+            Assets.getDrawable(item.accountNameFrom, context).let {
                 binding.payTools.setIcon(it, false)
             }
             AppUtils.getAppInfoFromPackageName(item.fromApp, context)?.let {
@@ -115,14 +120,14 @@ class OrderItemAdapter(
             }
         }
 
-        val rule = billInfo.channel
+        val rule = item.channel
         val regex = "\\[(.*?)]".toRegex()
         val matchResult = regex.find(rule)
         if (matchResult != null) {
             val (value) = matchResult.destructured
             binding.channel.text = value
         } else {
-            binding.channel.text = billInfo.channel
+            binding.channel.text = item.channel
         }
 
         //   binding.fromApp.setIcon()

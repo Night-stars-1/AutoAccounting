@@ -25,23 +25,20 @@ class BookSelectorAdapter(
     override val dataItems: List<BookName>,
     private val onClick: (item: BookName) -> Unit,
 ) : BaseAdapter(dataItems, AdapterBookBinding::class.java) {
-    override fun onBindView(
-        holder: BaseViewHolder,
-        item: Any,
-    ) {
-        val it = item as BookName
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        val item = dataItems[position]
         val binding = (holder.binding as AdapterBookBinding)
-        holder.scope.launch {
-            ImageUtils.get(holder.context, item.icon, R.drawable.default_book).let {
+        binding.book.setOnClickListener {
+            onClick(item)
+        }
+
+        scope.launch {
+            ImageUtils.get(holder.itemView.context, item.icon, R.drawable.default_book).let {
                 binding.book.background = it
             }
         }
         binding.itemValue.text = item.name
-    }
 
-    override fun onInitView(holder: BaseViewHolder) {
-        (holder.binding as AdapterBookBinding).book.setOnClickListener {
-            onClick(holder.item as BookName)
-        }
     }
 }
