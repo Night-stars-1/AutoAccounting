@@ -61,7 +61,6 @@ class OrderAdapter(
                 dataInnerItems,
                 onItemChildClick = { itemBill ->
                     Logger.i("onItemChildClick1")
-                    Logger.i(scope.isActive.toString())
                     holder.scope.launch {
                         Logger.i("onItemChildClick2")
                         FloatEditorDialog(context, itemBill, config, onlyShow = true){ billInfo ->

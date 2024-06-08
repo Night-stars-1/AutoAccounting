@@ -155,7 +155,7 @@ class CategorySelectorAdapter(
             if (item.parent != "-1") {
                 binding.ivMore.visibility = View.GONE
             } else {
-                holder.scope.launch {
+                scope.launch {
                     val count = Category.getAll(item.book, item.type, item.parent).size
                     if (count == 0) {
                         withContext(Dispatchers.Main) {
@@ -174,7 +174,7 @@ class CategorySelectorAdapter(
                     ),
                 )
             } else {
-                holder.scope.launch {
+                scope.launch {
                     // 自动切回主线程
                     ImageUtils.get(context, item.icon!!, R.drawable.default_cate).let {
                         binding.itemImageIcon.setImageDrawable(it)
@@ -207,7 +207,7 @@ class CategorySelectorAdapter(
             val leftDistanceView2 = 0 // item.id
             val layoutParams = binding.imageView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.leftMargin = leftDistanceView2 // 设置左边距
-            holder.scope.launch {
+            scope.launch {
                 withContext(Dispatchers.IO) {
                     val newData =
                         Category.getAll(
