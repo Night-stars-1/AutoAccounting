@@ -52,7 +52,7 @@ class MapDialog(
     private fun setBindingData() {
         binding.raw.setText(assetsMap.name)
         binding.target.setText(assetsMap.mapName)
-        binding.regex.isChecked = assetsMap.regex
+        binding.regex.isChecked = assetsMap.regex == 1
         lifecycleScope.launch {
             Assets.getDrawable(assetsMap.mapName, context).let {
                 binding.target.setIcon(it)
@@ -66,7 +66,7 @@ class MapDialog(
         binding.buttonSure.setOnClickListener {
             assetsMap.name = binding.raw.text.toString()
             assetsMap.mapName = binding.target.getText()
-            assetsMap.regex = binding.regex.isChecked
+            assetsMap.regex = if (binding.regex.isChecked) 1 else 0
 
             if (assetsMap.name.isEmpty() || assetsMap.mapName == context.getString(R.string.map_no_target)) {
                 Toaster.show(context.getString(R.string.map_empty))
