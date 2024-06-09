@@ -81,11 +81,10 @@ public:
 
     //分类
     void insertCate(const std::string& id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type);
-    Json::Value getAllCate(const std::string& parent = 0,const std::string& book = "", int type = 0);
+    Json::Value getAllCate(const std::string& parent = "0",const std::string& book = "", int type = 0);
     Json::Value getBookAllCate(const std::string& book = "");
     Json::Value getCate(const std::string& book,const std::string& cateName,int type);
     Json::Value getCateByRemote(const std::string& book,const std::string& remoteId);
-    void removeCate(const std::string& id);
 
     //自定义分类规则
     void insertCustomRule(int id, const std::string& js, const std::string&  text, const std::string&  element, int use,int sort,int _auto);
@@ -97,7 +96,7 @@ public:
     void insertRule( const std::string& app, const std::string&  js, const std::string&  version,  int type);
     Json::Value getRule(const std::string& app, int type);
 
-    static static Json::Value buildBill(sqlite3_stmt *stmt);
+    static Json::Value buildBill(sqlite3_stmt *stmt);
 
     Json::Value getBillAllParents();
 
@@ -107,7 +106,6 @@ public:
     void removeRule(int id);
     Json::Value getRule(int limit);
 
-    void addBxBills(const Json::Value& billArray);
 };
 
 

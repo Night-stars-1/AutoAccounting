@@ -116,7 +116,7 @@ class EditFragment : BaseFragment() {
                     showSelectType(flexboxLayout, view, it2)
                 }
             })
-        for (hashMap in list!!) {
+        for (hashMap in list) {
             flexboxLayout.appendWaveTextview(
                 hashMap["text"] as String,
                 connector = hashMap.containsKey("jsPre"),
@@ -489,7 +489,7 @@ class EditFragment : BaseFragment() {
             )
         list!!.add(otherData)
         condition += ""
-        val js = "if($condition){ return { book:'$bookName',category:'$category'} }"
+        val js = "if($condition){ return { bookName:'$bookName',cateName:'$category'} }"
 
         regular.js = js
         regular.text = text

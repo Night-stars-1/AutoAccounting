@@ -394,8 +394,15 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                     //不启用这个规则
                     ret["data"] = "rule not enable";
                 }else{
-                    std::string customJs = DbManager::getInstance().getSetting("server",
-                                                                               "custom_js");
+                    Json::Value JsList = DbManager::getInstance().loadCustomRules(500);
+                    std::string customJs;
+
+                    for (const Json::Value& item : JsList) {
+                        // 检查 "js" 键是否存在并且是字符串类型
+                        if (item.isMember("js") && item["js"].isString()) {
+                            customJs += item["js"].asString() + "\n"; // 将每个 js 字段的值合并，添加换行符
+                        }
+                    }
                     std::string official_cate_js = DbManager::getInstance().getSetting("server",
                                                                                        "official_cate_js");
                     std::string categoryJs =
