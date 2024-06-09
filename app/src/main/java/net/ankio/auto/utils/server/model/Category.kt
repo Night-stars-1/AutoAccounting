@@ -69,13 +69,14 @@ class Category {
         suspend fun getDrawable(
             cateName: String,
             bookID: String,
+            type: Int,
             context: Context,
         ): Drawable {
             var newCateName = cateName
             if (newCateName.contains("-")) {
                 newCateName = newCateName.split("-").last()
             }
-            val categoryInfo = getByName(newCateName, bookID)
+            val categoryInfo = getByID(newCateName, bookID, type)
             return ImageUtils.get(context, categoryInfo?.icon ?: "", R.drawable.default_cate)
         }
 
@@ -98,12 +99,17 @@ class Category {
             }
         }
 
-        private suspend fun getByName(
+        private suspend fun getByID(
             name: String,
             bookID: String,
+            type: Int = 0,
         ): Category? {
-            val data = AppUtils.getService().sendMsg("cate/get/name", mapOf("name" to name, "book" to bookID))
-            return runCatching { Gson().fromJson(data as String, Category::class.java) }.getOrNull()
+            val data = AppUtils.getService().sendMsg("cate/get/id", mapOf("name" to name, "book" to bookID, "type" to type))
+            return if (data !is JsonNull) {
+                Gson().fromJson(Gson().toJson(data), Category::class.java)
+            } else {
+                null
+            }
         }
 
         suspend fun getByRemote(

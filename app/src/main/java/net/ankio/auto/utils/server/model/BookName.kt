@@ -91,7 +91,7 @@ class BookName {
                 }
                 return book
             } else {
-                return getByName(localBookName )
+                return getByName(localBookName)
             }
         }
 

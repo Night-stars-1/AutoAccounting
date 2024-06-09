@@ -282,11 +282,11 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         } else if(message_type == "cate/get/book"){
             std::string book = data["book"].asString();
             ret["data"] = DbManager::getInstance().getBookAllCate(book);
-        } else if(message_type == "cate/get/name"){
+        } else if(message_type == "cate/get/id"){
             std::string book = data["book"].asString();
+            std::string name = data["name"].asString();
             int _type = data["type"].asInt();
-            std::string cateName = data["cateName"].asString();
-            ret["data"] = DbManager::getInstance().getCate(book, cateName,_type);
+            ret["data"] = DbManager::getInstance().getCate(book, name,_type);
         } else if(message_type == "cate/get/remote"){
             std::string book = data["book"].asString();
             std::string remoteId = data["remoteId"].asString();

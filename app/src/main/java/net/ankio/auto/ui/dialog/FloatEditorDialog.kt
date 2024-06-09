@@ -605,7 +605,7 @@ class FloatEditorDialog(
             binding.category.visibility = View.VISIBLE
             lifecycleScope.launch {
                 val book = BookName.getDefaultBook(billInfo.bookName)
-                Category.getDrawable(billInfo.cateName, book.id, context).let {
+                Category.getDrawable(billInfo.cateName, book.id, billInfo.type, context).let {
                     binding.category.setIcon(it, true)
                 }
             }

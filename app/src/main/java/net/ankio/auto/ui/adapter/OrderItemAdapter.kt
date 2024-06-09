@@ -68,8 +68,8 @@ class OrderItemAdapter(
 
         binding.category.setText(item.cateName)
         holder.scope.launch {
-            val book = BookName.getDefaultBook(item.bookName)
-            Category.getDrawable(item.cateName, book.id, context).let {
+            val book = BookName.getByName(item.bookName)
+            Category.getDrawable(item.cateName, book.id, item.type, context).let {
                 withContext(Dispatchers.Main) {
                     binding.category.setIcon(it, true)
                 }
