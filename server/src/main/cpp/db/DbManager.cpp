@@ -624,7 +624,7 @@ void DbManager::insertAssetMap(int id, const std::string &name, const std::strin
     int count = -1;
     if(id == 0){
         stmt = getStmt(
-                "INSERT INTO assetsMap ( name, mapName, regex) VALUES (?,?,?);");
+                "INSERT INTO assetsMap (name, mapName, regex) VALUES (?,?,?);");
     }else{
         count = 0;
         stmt = getStmt(
@@ -650,9 +650,9 @@ Json::Value DbManager::getAssetMap() {
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         Json::Value assetMap;
         assetMap["id"] = sqlite3_column_int(stmt, 0);
-        assetMap["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        assetMap["mapName"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        assetMap["regex"] = sqlite3_column_int(stmt, 3);
+        assetMap["regex"] = sqlite3_column_int(stmt, 1);
+        assetMap["name"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        assetMap["mapName"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
         ret.append(assetMap);
     }
     if (rc != SQLITE_DONE) {
@@ -933,11 +933,11 @@ void DbManager::insertCustomRule(int id, const std::string &js, const std::strin
     int count = -1;
     if(id == 0){
         stmt = getStmt(
-                "INSERT INTO customRule ( js, text, element, use, sort, auto) VALUES (?,?,?,?,?,?);");
+                "INSERT INTO customRule (js, text, element, use, sort, auto) VALUES (?,?,?,?,?,?);");
     }else{
         count = 0;
         stmt = getStmt(
-                "INSERT OR REPLACE INTO customRule (id, js, text, element, use, sort, auto) VALUES (?,?,?,?,?,?,?,?);");
+                "INSERT OR REPLACE INTO customRule (id, js, text, element, use, sort, auto) VALUES (?,?,?,?,?,?,?);");
 
     }
     if(count == 0){

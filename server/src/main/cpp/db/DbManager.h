@@ -85,6 +85,7 @@ public:
     Json::Value getBookAllCate(const std::string& book = "");
     Json::Value getCate(const std::string& book,const std::string& cateName,int type);
     Json::Value getCateByRemote(const std::string& book,const std::string& remoteId);
+    void removeCate(const std::string& id);
 
     //自定义分类规则
     void insertCustomRule(int id, const std::string& js, const std::string&  text, const std::string&  element, int use,int sort,int _auto);
@@ -106,6 +107,7 @@ public:
     void removeRule(int id);
     Json::Value getRule(int limit);
 
+    void addBxBills(const Json::Value& billArray);
 };
 
 
