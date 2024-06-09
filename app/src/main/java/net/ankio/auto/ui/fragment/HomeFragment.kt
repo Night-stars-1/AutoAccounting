@@ -55,11 +55,6 @@ import net.ankio.auto.utils.update.UpdateUtils
 import rikka.html.text.toHtml
 import java.io.File
 
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : BaseFragment() {
     private lateinit var binding: FragmentHomeBinding
     private var cacheDir: File? = null
@@ -166,7 +161,7 @@ class HomeFragment : BaseFragment() {
     private fun bindActiveUI() {
         val colorPrimary =
             AppUtils.getThemeAttrColor(com.google.android.material.R.attr.colorPrimary)
-
+        Logger.i(ActiveUtils.getActiveAndSupportFramework().toString())
         if (!ActiveUtils.getActiveAndSupportFramework()) {
             setActive(
                 SurfaceColors.SURFACE_3.getColor(requireContext()),

@@ -105,7 +105,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun onBottomViewInit() {
+    private fun onBottomViewInit() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

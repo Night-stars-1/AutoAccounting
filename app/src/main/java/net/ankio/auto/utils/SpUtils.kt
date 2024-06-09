@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import net.ankio.auto.utils.server.model.SettingModel
 
 object SpUtils {
-    val sp = AppUtils.getApplication().getSharedPreferences("setting", 0)
+    private val sp = AppUtils.getApplication().getSharedPreferences("setting", 0)
 
     fun putBooleanRemote(
         key: String,
