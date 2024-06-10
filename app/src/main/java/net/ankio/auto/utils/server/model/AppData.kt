@@ -83,5 +83,11 @@ class AppData {
                 AppUtils.getService().sendMsg("data/delete/all", null)
             }
         }
+
+        fun delete(id: Int) {
+            AppUtils.getScope().launch {
+                AppUtils.getService().sendMsg("data/delete/id", mapOf("id" to id))
+            }
+        }
     }
 }

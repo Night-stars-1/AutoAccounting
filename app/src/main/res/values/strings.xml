@@ -348,4 +348,6 @@
     <string name="stop">停止</string>
     <string name="test_rule">测试规则</string>
     <string name="upload_data">上传数据</string>
+    <string name="confirm_action">操作确认</string>
+    <string name="confirm_action_context">是否删除该条数据？</string>
 </resources>

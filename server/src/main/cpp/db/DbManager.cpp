@@ -547,6 +547,16 @@ void DbManager::deleteAllAppData(){
     }
 }
 
+void DbManager::deleteAppData(int id) {
+    sqlite3_stmt *stmt = getStmt("DELETE FROM appData WHERE id = ?;");
+    sqlite3_bind_int(stmt, 1, id);
+    int rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "SQL error 3: %s\n", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+}
+
 void DbManager::insertAsset(const std::string &id, const std::string &name, int type, int sort, const std::string &icon,
                             const std::string &extra) {
     int count = 0;

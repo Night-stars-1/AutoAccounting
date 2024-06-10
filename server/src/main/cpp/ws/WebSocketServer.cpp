@@ -204,6 +204,9 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             ret["data"]=DbManager::getInstance().getAppData(data["limit"].asInt());
         } else if(message_type == "data/delete/all") {
             DbManager::getInstance().deleteAllAppData();
+        } else if (message_type == "data/delete/id") {
+            int id = data["id"].asInt();
+            DbManager::getInstance().deleteAppData(id);
         }
 
 

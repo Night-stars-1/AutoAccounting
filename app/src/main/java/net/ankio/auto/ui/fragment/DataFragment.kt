@@ -90,6 +90,19 @@ class DataFragment : BaseFragment() {
         adapter =
             DataAdapter(
                 dataItems,
+                onClickRoot = { item: AppData ->
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(requireContext().getString(R.string.confirm_action))
+                        .setMessage(requireContext().getString(R.string.confirm_action_context))
+                        .setNegativeButton(requireContext().getString(R.string.cancel_msg)) { _, _ -> }
+                        .setPositiveButton(requireContext().getString(R.string.sure_msg)) { _, _ ->
+                            AppData.delete(item.id)
+                            recyclerView.adapter?.notifyItemRemoved(dataItems.indexOf(item))
+                            dataItems.remove(item)
+                        }
+                        .show()
+                    AppData.delete(item.id)
+                },
                 onClickContent = { string ->
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(requireContext().getString(R.string.content_title))

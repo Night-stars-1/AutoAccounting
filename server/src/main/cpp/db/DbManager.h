@@ -60,6 +60,7 @@ public:
     int insertAppData(int id,const std::string& data, int type, const std::string& source,const std::string &rule,int timeStamp,int match,int issue);
     Json::Value getAppData(int limit);
     void deleteAllAppData();
+    void deleteAppData(int id);
 
     //资产
     void insertAsset(const std::string& id, const std::string& name, int type, int sort, const std::string&  icon, const std::string& extra);

@@ -35,6 +35,7 @@ import net.ankio.auto.utils.server.model.AppData
 
 class DataAdapter(
     override val dataItems: MutableList<AppData>,
+    private val onClickRoot: (item: AppData) -> Unit,
     private val onClickContent: (string: String) -> Unit,
     private val onClickTest: (item: AppData) -> Unit,
     private val onClickUploadData: (item: AppData, pos: Int) -> Unit,
@@ -42,6 +43,11 @@ class DataAdapter(
     private fun onInitView(holder: BaseViewHolder, item: AppData) {
         val binding = holder.binding as AdapterDataBinding
         val context = holder.itemView.context
+
+        binding.root.setOnLongClickListener {
+            onClickRoot(item)
+            true
+        }
 
         binding.issue.setOnClickListener {
             CustomTabsHelper.launchUrl(

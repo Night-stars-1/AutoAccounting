@@ -299,5 +299,7 @@
     <string name="stop">Stop</string>
     <string name="test_rule">测试规则</string>
     <string name="upload_data">上传数据</string>
+    <string name="confirm_action">Confirm Action</string>
+    <string name="confirm_action_context">Are you sure you want to proceed?</string>
 
 </resources>
