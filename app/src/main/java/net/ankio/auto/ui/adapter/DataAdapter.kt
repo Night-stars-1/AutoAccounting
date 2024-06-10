@@ -172,7 +172,7 @@ class DataAdapter(
                 return@withContext
             }
             hashMap[item] = t
-            val result = Engine.analyze(item.type, item.source, item.data)
+            val result = Engine.analyze(item.type, item.source, item.data, false, item.id)
             if (result != null) {
                 item.rule = result.channel
                 item.match = 1
