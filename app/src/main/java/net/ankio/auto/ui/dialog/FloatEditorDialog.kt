@@ -129,8 +129,8 @@ class FloatEditorDialog(
                 }
 
                 BillType.Income -> {
-                    this.accountNameFrom = binding.payFrom.getText()
-                    this.accountNameTo = ""
+                    this.accountNameFrom = ""
+                    this.accountNameTo = binding.payFrom.getText()
                 }
 
                 BillType.Transfer -> {
@@ -354,20 +354,18 @@ class FloatEditorDialog(
         if (!autoAccountingConfig.assetManagement || billTypeLevel1 == BillType.Transfer) {
             // 没有资产管理
             return
-        }
-
-        if (
+        } else if (billTypeLevel2 == BillType.Income) {
+            // 收入
+            binding.payInfo.visibility = View.VISIBLE
+            setAssetItem(billInfo.accountNameTo, binding.payFrom)
+        } else if (
             billTypeLevel2 != BillType.ExpendLending && // 借出
             billTypeLevel2 != BillType.IncomeLending // 借入
         ) { // 这三个有单独的UI
             // 收入销账、收入报销
             binding.payInfo.visibility = View.VISIBLE
             setAssetItem(billInfo.accountNameFrom, binding.payFrom)
-        }
-
-        // 如果是债务销账，则显示这个UI
-
-        if (billTypeLevel2 == BillType.ExpendRepayment || billTypeLevel2 == BillType.IncomeRepayment) {
+        } else if (billTypeLevel2 == BillType.ExpendRepayment || billTypeLevel2 == BillType.IncomeRepayment) {
             binding.payInfo.visibility = View.VISIBLE
             setAssetItem(billInfo.accountNameFrom, binding.payFrom)
         }
@@ -611,6 +609,8 @@ class FloatEditorDialog(
                 } else {
                     BookName.getDefaultBook(billInfo.bookName)
                 }
+                billInfo.bookName = book.name
+                billInfo.bookId = book.id
                 Category.getDrawable(billInfo.cateName, book.id, billInfo.type, context).let {
                     binding.category.setIcon(it, true)
                 }

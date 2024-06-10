@@ -119,7 +119,7 @@ class DataFragment : BaseFragment() {
                         } else {
                             val tpl = SpUtils.getString("setting_bill_remark", "【商户名称】 - 【商品名称】")
                             result.remark = BillUtils.getRemark(result, tpl)
-                            result.bookId = BookName.getByName(result.bookName).id
+                            // result.bookId = BookName.getByName(result.bookName).id
                             BillUtils.setAccountMap(result)
                             AppUtils.getService().config().let {
                                 FloatEditorDialog(requireActivity(), result, it).show(float = false)
