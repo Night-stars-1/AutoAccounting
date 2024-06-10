@@ -22,5 +22,6 @@ import androidx.navigation.NavController
 data class MenuItem(
     @StringRes val title: Int,
     @DrawableRes val drawable: Int,
-    val callback: (NavController) -> Unit,
+    val subMenuItems: List<MenuItem>? = null,
+    val callback: (NavController) -> Unit = {},
 )

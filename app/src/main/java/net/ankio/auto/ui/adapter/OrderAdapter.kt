@@ -18,12 +18,10 @@ package net.ankio.auto.ui.adapter
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.elevation.SurfaceColors
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.ankio.auto.databinding.AdapterOrderBinding
 import net.ankio.auto.ui.dialog.BillMoreDialog
 import net.ankio.auto.ui.dialog.FloatEditorDialog
-import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.common.model.AccountingConfig
 

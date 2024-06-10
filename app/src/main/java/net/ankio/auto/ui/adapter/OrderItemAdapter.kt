@@ -24,7 +24,6 @@ import net.ankio.auto.app.BillUtils
 import net.ankio.auto.databinding.AdapterOrderItemBinding
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.DateUtils
-import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.server.model.Assets
 import net.ankio.auto.utils.server.model.BillInfo
 import net.ankio.auto.utils.server.model.BookName
@@ -42,6 +41,9 @@ class OrderItemAdapter(
         val binding = holder.binding as AdapterOrderItemBinding
         binding.root.setOnClickListener {
             onItemChildClick?.invoke(item)
+        }
+        binding.root.setOnLongClickListener {
+            true
         }
         binding.moreBills.setOnClickListener {
             onItemChildMoreClick?.invoke(item)
@@ -108,14 +110,27 @@ class OrderItemAdapter(
 
         binding.remark.text = item.remark
 
-        binding.payTools.setText(item.accountNameFrom)
+        if (type == BillType.Income) {
+            binding.payTools.setText(item.accountNameTo)
 
-        holder.scope.launch {
-            Assets.getDrawable(item.accountNameFrom, context).let {
-                binding.payTools.setIcon(it, false)
+            holder.scope.launch {
+                Assets.getDrawable(item.accountNameTo, context).let {
+                    binding.payTools.setIcon(it, false)
+                }
+                AppUtils.getAppInfoFromPackageName(item.fromApp, context)?.let {
+                    binding.fromApp.setImageDrawable(it.icon)
+                }
             }
-            AppUtils.getAppInfoFromPackageName(item.fromApp, context)?.let {
-                binding.fromApp.setImageDrawable(it.icon)
+        } else {
+            binding.payTools.setText(item.accountNameFrom)
+
+            holder.scope.launch {
+                Assets.getDrawable(item.accountNameFrom, context).let {
+                    binding.payTools.setIcon(it, false)
+                }
+                AppUtils.getAppInfoFromPackageName(item.fromApp, context)?.let {
+                    binding.fromApp.setImageDrawable(it.icon)
+                }
             }
         }
 
