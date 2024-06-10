@@ -53,6 +53,26 @@ abstract class BaseFragment : Fragment() {
     private var init = false
     lateinit var scrollView: View
 
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//        val mainActivity = activity as MainActivity
+//        activityBinding = mainActivity.getBinding()
+//        val toolbar = activityBinding.toolbar
+//
+//        toolbar.addMenuProvider(object : MenuProvider {
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                // 使用菜单填充器将菜单项添加到传入的菜单对象中
+//                menuInflater.inflate(R.menu.home_top_menu, menu)
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean {
+//                return when (menuItem.itemId) {
+//                    else -> false
+//                }
+//            }
+//        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+//    }
+
     override fun onResume() {
         super.onResume()
         val mainActivity = activity as MainActivity
@@ -143,7 +163,7 @@ abstract class BaseFragment : Fragment() {
         colorAnimator.start()
     }
 
-    public fun serverByRoot(shell: String) {
+    fun serverByRoot(shell: String) {
         val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
         val textView = dialogBinding.progressText
         val scrollView = dialogBinding.scrollView

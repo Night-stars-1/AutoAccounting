@@ -17,12 +17,14 @@ package net.ankio.auto.ui.fragment
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -74,18 +76,24 @@ class HomeFragment : BaseFragment() {
                 serverByRoot("sh ${cacheDir!!.path}/shell/stop.sh")
             },
             MenuItem(R.string.title_more, R.drawable.menu_item_more) {
-                val binding =
-                    AboutDialogBinding.inflate(LayoutInflater.from(requireContext()), null, false)
-                binding.sourceCode.movementMethod = LinkMovementMethod.getInstance()
-                binding.sourceCode.text =
-                    getString(
-                        R.string.about_view_source_code,
-                        "<b><a href=\"https://github.com/AutoAccountingOrg/AutoAccounting\">GitHub</a></b>",
-                    ).toHtml()
-                binding.versionName.text = AppUtils.getVersionName()
-                MaterialAlertDialogBuilder(requireContext())
-                    .setView(binding.root)
-                    .show()
+                val popup = PopupMenu(requireContext(), activityBinding.toolbar, Gravity.END)
+                popup.menu.add("关于")
+                popup.setOnMenuItemClickListener {
+                    val binding =
+                        AboutDialogBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+                    binding.sourceCode.movementMethod = LinkMovementMethod.getInstance()
+                    binding.sourceCode.text =
+                        getString(
+                            R.string.about_view_source_code,
+                            "<b><a href=\"https://github.com/AutoAccountingOrg/AutoAccounting\">GitHub</a></b>",
+                        ).toHtml()
+                    binding.versionName.text = AppUtils.getVersionName()
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setView(binding.root)
+                        .show()
+                    true
+                }
+                popup.show()
             },
         )
 
