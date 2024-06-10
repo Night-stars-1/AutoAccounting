@@ -162,6 +162,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string cateName = data["cateName"].asString();
             std::string extendData = data["extendData"].asString();
             std::string bookName = data["bookName"].asString();
+            std::string bookId = data["bookId"].asString();
             std::string accountNameFrom = data["accountNameFrom"].asString();
             std::string accountNameTo = data["accountNameTo"].asString();
             std::string fromApp = data["fromApp"].asString();
@@ -171,7 +172,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             std::string remark = data["remark"].asString();
             int fromType = data["fromType"].asInt();
 
-            ret["data"]=DbManager::getInstance().insertBill(id, _type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType);
+            ret["data"]=DbManager::getInstance().insertBill(id, _type, currency, money, fee, timeStamp, shopName, cateName, extendData, bookName, bookId, accountNameFrom, accountNameTo, fromApp, groupId, channel, syncFromApp, remark, fromType);
         }else if(message_type == "bill/sync/list"){
             ret["data"]=DbManager::getInstance().getWaitSyncBills();
             //要求账单app每次同步完后都要发送一个消息给服务器，服务器更新状态
@@ -432,6 +433,11 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                         _json["timeStamp"] = _json["time"]; // 参数纠正
                         _json["fromApp"] = app; // 补全缺失参数
 
+                        //兼容措施
+                        if (_json["type"] == 1) {
+                            _json["accountNameTo"] = _json["accountNameFrom"];
+                            _json["accountNameFrom"] = "";
+                        }
 
 
                         //拉起自动记账app
