@@ -50,7 +50,7 @@ import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
 import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.server.model.AppData
-import net.ankio.auto.utils.server.model.LogModel
+import net.ankio.auto.utils.server.model.BookName
 
 class DataFragment : BaseFragment() {
     private lateinit var binding: FragmentDataBinding
@@ -119,6 +119,7 @@ class DataFragment : BaseFragment() {
                         } else {
                             val tpl = SpUtils.getString("setting_bill_remark", "【商户名称】 - 【商品名称】")
                             result.remark = BillUtils.getRemark(result, tpl)
+                            result.bookId = BookName.getByName(result.bookName).id
                             BillUtils.setAccountMap(result)
                             AppUtils.getService().config().let {
                                 FloatEditorDialog(requireActivity(), result, it).show(float = false)

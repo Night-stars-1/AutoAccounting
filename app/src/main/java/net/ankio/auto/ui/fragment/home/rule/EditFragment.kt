@@ -489,7 +489,7 @@ class EditFragment : BaseFragment() {
             )
         list!!.add(otherData)
         condition += ""
-        val js = "if($condition){ return { bookName:'$bookName',cateName:'$category'} }"
+        val js = "if($condition){ return { book:'$bookName',category:'$category'} }"
 
         regular.js = js
         regular.text = text

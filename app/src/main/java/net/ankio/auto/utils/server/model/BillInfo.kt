@@ -46,7 +46,6 @@ class BillInfo {
 
     /**
      * 记账时间
-     * yyyy-MM-dd HH:mm:ss
      */
     var timeStamp: Long = 0
 

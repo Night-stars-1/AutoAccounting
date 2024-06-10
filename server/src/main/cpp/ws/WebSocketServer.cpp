@@ -425,8 +425,9 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                         printf("json parse error\n");
                         ret["data"] = "json parse error";
                     } else {
-                        std::string bookName = categoryJson["bookName"].asString();
-                        std::string cateName = categoryJson["cateName"].asString();
+                        // 兼容措施
+                        std::string bookName = categoryJson["book"].asString();
+                        std::string cateName = categoryJson["category"].asString();
 
                         _json["bookName"] = bookName;
                         _json["cateName"] = cateName;
@@ -434,7 +435,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                         _json["fromApp"] = app; // 补全缺失参数
 
                         //兼容措施
-                        if (_json["type"] == 1) {
+                        if (bill_type == 1) {
                             _json["accountNameTo"] = _json["accountNameFrom"];
                             _json["accountNameFrom"] = "";
                         }
@@ -573,7 +574,7 @@ void WebSocketServer::log(const std::string &msg,int level ){
 
 std::string WebSocketServer::runJs(const std::string &js) {
     log("执行JS脚本",LOG_LEVEL_INFO);
-    log("脚本内容: " + js,LOG_LEVEL_DEBUG);
+    // log("脚本内容: " + js,LOG_LEVEL_DEBUG);
     qjs::Runtime runtime;
     qjs::Context context(runtime);
     std::thread::id id = std::this_thread::get_id();
