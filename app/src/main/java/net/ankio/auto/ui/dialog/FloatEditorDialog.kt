@@ -119,6 +119,7 @@ class FloatEditorDialog(
             this.type = billInfo.type
             this.fee = billInfo.fee
             this.bookName = billInfo.bookName
+            this.bookId = billInfo.bookId
             this.type = billTypeLevel2.value
 
             when (billTypeLevel2) {
@@ -326,6 +327,7 @@ class FloatEditorDialog(
             if (!autoAccountingConfig.multiBooks) return@setOnClickListener
             BookSelectorDialog(context) {
                 billInfo.bookName = it.name
+                billInfo.bookId = it.id
                 bindingBookNameUI()
             }.show(float)
         }
@@ -604,7 +606,11 @@ class FloatEditorDialog(
         if (billTypeLevel1 == BillType.Income || billTypeLevel1 == BillType.Expend) {
             binding.category.visibility = View.VISIBLE
             lifecycleScope.launch {
-                val book = BookName.getDefaultBook(billInfo.bookName)
+                val book = if (onlyShow) {
+                    BookName.getByName(billInfo.bookName)
+                } else {
+                    BookName.getDefaultBook(billInfo.bookName)
+                }
                 Category.getDrawable(billInfo.cateName, book.id, billInfo.type, context).let {
                     binding.category.setIcon(it, true)
                 }
@@ -619,6 +625,8 @@ class FloatEditorDialog(
         binding.category.setOnClickListener {
             lifecycleScope.launch {
                 val book = BookName.getDefaultBook(billInfo.bookName)
+                billInfo.bookName = book.name
+                billInfo.bookId = book.id
                 withContext(Dispatchers.Main) {
                     CategorySelectorDialog(context, book.id, billTypeLevel1) { parent, child ->
                         if (parent == null)return@CategorySelectorDialog

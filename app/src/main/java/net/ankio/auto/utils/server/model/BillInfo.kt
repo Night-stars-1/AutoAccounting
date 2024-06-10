@@ -76,6 +76,11 @@ class BillInfo {
     var bookName: String = ""
 
     /**
+     * 账本id
+     */
+    var bookId: String = ""
+
+    /**
      * 账单所属资产名称（或者转出账户）
      */
     var accountNameFrom: String = ""
@@ -128,6 +133,7 @@ class BillInfo {
         billInfo.cateName = cateName
         billInfo.extendData = extendData
         billInfo.bookName = bookName
+        billInfo.bookId = bookId
         billInfo.accountNameFrom = accountNameFrom
         billInfo.accountNameTo = accountNameTo
         billInfo.fromApp = fromApp
