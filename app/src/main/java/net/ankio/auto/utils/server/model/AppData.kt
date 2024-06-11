@@ -72,7 +72,7 @@ class AppData {
         suspend fun get(limit: Int = 500): List<AppData> {
             val data = AppUtils.getService().sendMsg("data/get", mapOf("limit" to limit))
             return if (data !is JsonNull) {
-                Gson().fromJson(Gson().toJson(data), Array<AppData>::class.java).toList()
+                Gson().fromJson(Gson().toJson(data), Array<AppData>::class.java).toList().reversed()
             } else {
                 emptyList()
             }
