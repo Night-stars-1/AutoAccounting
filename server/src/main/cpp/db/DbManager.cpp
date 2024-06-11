@@ -633,6 +633,17 @@ void DbManager::removeAsset(std::string &name) {
     sqlite3_finalize(stmt);
 }
 
+void DbManager::removeAssetAll() {
+    char *zErrMsg = nullptr;
+    sqlite3_exec(db,
+                 "DELETE FROM assets;",
+                 nullptr, nullptr, &zErrMsg);
+    if (zErrMsg) {
+        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+}
+
 void DbManager::insertAssetMap(int id, const std::string &name, const std::string &mapName, int regex) {
     sqlite3_stmt *stmt;
     int count = -1;
@@ -900,6 +911,17 @@ void DbManager::removeCate(const std::string &id) {
         fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
+}
+
+void DbManager::removeCateAll() {
+    char *zErrMsg = nullptr;
+    sqlite3_exec(db,
+                 "DELETE FROM category;",
+                 nullptr, nullptr, &zErrMsg);
+    if (zErrMsg) {
+        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
 }
 
 void DbManager::insertRule(const std::string &app, const std::string &js,

@@ -67,6 +67,7 @@ public:
     Json::Value getAsset(int limit);
     Json::Value getAssetByName(const std::string& name);
     void removeAsset(std::string& name);
+    void removeAssetAll();
 
     //资产映射
     void insertAssetMap(int id, const std::string& name, const std::string&  mapName, int regex);
@@ -87,6 +88,7 @@ public:
     Json::Value getCate(const std::string& book,const std::string& cateName,int type);
     Json::Value getCateByRemote(const std::string& book,const std::string& remoteId);
     void removeCate(const std::string& id);
+    void removeCateAll();
 
     //自定义分类规则
     void insertCustomRule(int id, const std::string& js, const std::string&  text, const std::string&  element, int use,int sort,int _auto);

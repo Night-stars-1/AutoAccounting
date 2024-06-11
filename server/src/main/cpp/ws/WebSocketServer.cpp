@@ -226,6 +226,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         } else if(message_type == "asset/remove"){
             std::string name = data["name"].asString();
             DbManager::getInstance().removeAsset(name);
+        } else if(message_type == "asset/remove/all"){
+            DbManager::getInstance().removeAssetAll();
         }
 
 
@@ -297,7 +299,9 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             ret["data"] = DbManager::getInstance().getCateByRemote(book, remoteId);
         } else if(message_type == "cate/remove"){
             std::string id = data["id"].asString();
-            DbManager::getInstance().removeAssetMap(id);
+            DbManager::getInstance().removeCate(id);
+        } else if(message_type == "cate/remove/all"){
+            DbManager::getInstance().removeCateAll();
         }
 
         else if(message_type == "rule/custom/put"){

@@ -50,10 +50,10 @@ class FloatingWindowTriggerActivity : AppCompatActivity() {
                 }
             lifecycleScope.launch {
                 AppUtils.getService().config()
+                startService(serviceIntent)
+                // 关闭 Activity
+                exitActivity()
             }
-            startService(serviceIntent)
-            // 关闭 Activity
-            exitActivity()
         }.onFailure {
             Logger.e("解析数据失败", it)
             exitActivity()
