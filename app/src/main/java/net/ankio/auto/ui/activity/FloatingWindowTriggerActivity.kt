@@ -21,9 +21,11 @@ import android.util.Base64
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import net.ankio.auto.events.AutoServerConnectedEvent
 import net.ankio.auto.service.FloatingWindowService
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
+import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.AutoServer
 
 class FloatingWindowTriggerActivity : AppCompatActivity() {
@@ -48,11 +50,15 @@ class FloatingWindowTriggerActivity : AppCompatActivity() {
                 Intent(this, FloatingWindowService::class.java).apply {
                     putExtra("data", dataValue)
                 }
-            lifecycleScope.launch {
-                AppUtils.getService().config()
-                startService(serviceIntent)
-                // 关闭 Activity
-                exitActivity()
+            val server = AppUtils.getService()
+            server.connect()
+            EventBus.register(AutoServerConnectedEvent::class.java) {
+                lifecycleScope.launch {
+                    server.config()
+                    startService(serviceIntent)
+                    // 关闭 Activity
+                    exitActivity()
+                }
             }
         }.onFailure {
             Logger.e("解析数据失败", it)

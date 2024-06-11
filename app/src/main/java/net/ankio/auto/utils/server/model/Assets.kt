@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
+import net.ankio.auto.utils.Logger
 
 class Assets {
     // 账户列表
@@ -47,7 +48,8 @@ class Assets {
 
         suspend fun get(limit: Int = 500): List<Assets> {
             val data = AppUtils.getService().sendMsg("asset/get", mapOf("limit" to limit))
-            return if (data !is JsonNull) {
+            Logger.i(data.toString())
+            return if (data !is JsonNull && data != null) {
                 Gson().fromJson(Gson().toJson(data), Array<Assets>::class.java).toList()
             } else {
                 emptyList()
