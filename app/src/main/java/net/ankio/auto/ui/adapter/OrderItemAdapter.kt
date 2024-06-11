@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.ankio.auto.R
 import net.ankio.auto.app.BillUtils
 import net.ankio.auto.databinding.AdapterOrderItemBinding
 import net.ankio.auto.utils.AppUtils
@@ -135,6 +136,9 @@ class OrderItemAdapter(
         }
 
         val rule = item.channel
+        if (item.syncFromApp == 0) {
+            binding.channel.background = ContextCompat.getDrawable(context, R.drawable.rounded_background_info)
+        }
         val regex = "\\[(.*?)]".toRegex()
         val matchResult = regex.find(rule)
         if (matchResult != null) {
