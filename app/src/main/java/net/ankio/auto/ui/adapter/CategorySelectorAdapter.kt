@@ -24,7 +24,9 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankio.auto.R
@@ -99,6 +101,8 @@ class CategorySelectorAdapter(
         override val binding: AdapterCategoryListBinding,
     ) : BaseViewHolder(binding)
     {
+        private val job = Job()
+        private val scope1 = CoroutineScope(Dispatchers.Main + job)
         private lateinit var adapter: CategorySelectorAdapter
         val context: Context = binding.root.context
 
@@ -214,7 +218,7 @@ class CategorySelectorAdapter(
             val leftDistanceView2 = 0 // item.id
             val layoutParams = binding.imageView.layoutParams as ViewGroup.MarginLayoutParams
             layoutParams.leftMargin = leftDistanceView2 // 设置左边距
-            scope.launch {
+            scope1.launch {
                 withContext(Dispatchers.IO) {
                     val newData =
                         Category.getAll(

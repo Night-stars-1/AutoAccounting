@@ -234,6 +234,7 @@ object AppUtils {
         val packageName = SpUtils.getString("bookApp", "")
         val launchIntent = application.packageManager.getLaunchIntentForPackage(packageName)
         if (launchIntent != null) {
+            launchIntent.putExtra("type","syncBill")
             application.startActivity(launchIntent)
         }
     }
