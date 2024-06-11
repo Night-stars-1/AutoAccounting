@@ -171,9 +171,9 @@ class BillInfo {
             return array
         }
 
-        suspend fun getBillByIds(ids: String): Array<BillInfo> {
+        suspend fun getBillByIds(ids: String): List<BillInfo> {
             val data = AppUtils.getService().sendMsg("bill/list/id", mapOf("ids" to ids))
-            return Gson().fromJson(data as JsonArray, Array<BillInfo>::class.java)
+            return Gson().fromJson(data as JsonArray, Array<BillInfo>::class.java).reversed()
         }
 
         suspend fun getBillByGroup(group: Int): Array<BillInfo> {
