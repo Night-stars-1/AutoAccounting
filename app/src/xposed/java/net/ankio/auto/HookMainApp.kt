@@ -8,6 +8,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 import net.ankio.auto.api.Hooker
 import net.ankio.auto.hooks.alipay.AlipayHooker
 import net.ankio.auto.hooks.auto.AutoHooker
+import net.ankio.auto.hooks.qiekj.QiekjHooker
 import net.ankio.auto.hooks.wechat.WechatHooker
 
 class HookMainApp : IXposedHookLoadPackage, IXposedHookZygoteInit {
@@ -42,6 +43,7 @@ class HookMainApp : IXposedHookLoadPackage, IXposedHookZygoteInit {
             AutoHooker(), // 自动记账hook
             AlipayHooker(), // 支付宝hook
             WechatHooker(), // 微信Hook
+            QiekjHooker(), // 胖乖生活hook
         )
 
     @Throws(Throwable::class)

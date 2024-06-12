@@ -49,7 +49,7 @@ class ActiveHooker(hooker: Hooker) : PartHooker(hooker) {
                     // 设置字段可访问
                     tagField.isAccessible = true
                     // 获取TAG字段的值
-                    param.result = tagField.get(null) as String
+                    param.result = (tagField.get(null) as String).replace("-Bridge", "")
                 }
             },
         )

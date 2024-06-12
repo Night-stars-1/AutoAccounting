@@ -83,19 +83,16 @@ class HookUtils(val context: Application, private val packageName: String) {
     }
 
     /**
-     * TODO 公测结束后需要使用正常模式
      * 判断自动记账目前是否处于调试模式
      */
-    suspend fun isDebug(): Boolean = true
-       /* withContext(Dispatchers.IO) {
+    suspend fun isDebug(): Boolean =
+        withContext(Dispatchers.IO) {
             if (BuildConfig.DEBUG) {
                 true
             } else {
-                runCatching {
-                    autoAccountingServiceUtils.get("debug") == "true"
-                }.getOrNull() ?: false
+                SpUtils.getBoolean("setting_debug", false)
             }
-        }*/
+        }
 
     // 仅调试模式输出日志
     suspend fun logD(

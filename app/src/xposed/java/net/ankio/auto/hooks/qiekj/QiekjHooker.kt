@@ -13,28 +13,26 @@
  *   limitations under the License.
  */
 
-package net.ankio.auto.hooks.alipay
+package net.ankio.auto.hooks.qiekj
 
 import android.content.Context
 import net.ankio.auto.api.Hooker
 import net.ankio.auto.api.PartHooker
-import net.ankio.auto.hooks.alipay.hooks.MessageBoxHooker
-import net.ankio.auto.hooks.alipay.hooks.RedPackageHooker
-import net.ankio.auto.hooks.alipay.hooks.SettingUIHooker
-import net.ankio.auto.hooks.alipay.hooks.WebViewHooker
+import net.ankio.auto.hooks.qiekj.hooks.ResponseHooker
 
-class AlipayHooker: Hooker() {
-    override val packPageName: String = "com.eg.android.AlipayGphone"
-    override val appName: String = "支付宝"
-    override val applicationClazz: String = "com.alipay.mobile.quinox.LauncherApplication"
+
+class QiekjHooker: Hooker(){
+    override val packPageName: String = "com.qiekj.user"
+    override val appName: String = "胖乖生活"
     override var partHookers: MutableList<PartHooker> = arrayListOf(
-        SettingUIHooker(this),//支付宝设置
-        MessageBoxHooker(this),//支付消息盒子
-        RedPackageHooker(this),//支付宝红包
-        WebViewHooker(this),//支付宝webview
+        ResponseHooker(this),
     )
 
     override fun hookLoadPackage(classLoader: ClassLoader, context: Context) {
 
     }
+
+
 }
+
+

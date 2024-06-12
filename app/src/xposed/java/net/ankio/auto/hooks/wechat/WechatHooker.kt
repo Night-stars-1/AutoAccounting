@@ -16,12 +16,6 @@
 package net.ankio.auto.hooks.wechat
 
 import android.content.Context
-import android.content.Intent
-import android.os.FileUtils
-import android.util.Log
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.XposedHelpers
 import net.ankio.auto.api.Hooker
 import net.ankio.auto.api.PartHooker
 import net.ankio.auto.hooks.wechat.hooks.ChatUserHooker
@@ -31,8 +25,6 @@ import net.ankio.auto.hooks.wechat.hooks.TransferHooker
 import net.ankio.dex.model.Clazz
 import net.ankio.dex.model.ClazzField
 import net.ankio.dex.model.ClazzMethod
-import java.nio.file.Files
-import java.nio.file.Paths
 
 
 class WechatHooker: Hooker(){

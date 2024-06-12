@@ -41,10 +41,12 @@ import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import kotlinx.coroutines.launch
+import net.ankio.auto.BuildConfig
 import net.ankio.auto.HookMainApp
 import net.ankio.auto.utils.HookUtils
 import net.ankio.dex.Dex
 import net.ankio.dex.model.Clazz
+
 
 abstract class Hooker : iHooker {
     abstract var partHookers: MutableList<PartHooker>
@@ -73,13 +75,10 @@ abstract class Hooker : iHooker {
                 "attach",
                 Context::class.java,
                 object : XC_MethodHook() {
-                    @Throws(Throwable::class)
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        super.afterHookedMethod(param)
                         if (hookStatus) {
                             return
                         }
-
                         val context = param.thisObject as Application
 
                         onCachedApplication(context)
@@ -87,6 +86,7 @@ abstract class Hooker : iHooker {
                 },
             )
         }.onFailure {
+            XposedBridge.log("测试2")
             runCatching {
                 XposedHelpers.findAndHookMethod(
                     applicationClazz,
@@ -173,6 +173,9 @@ abstract class Hooker : iHooker {
         ) {
             return
         }
+        if (pkg == BuildConfig.APPLICATION_ID && BuildConfig.DEBUG) {
+            return
+        }
         hookMainInOtherAppContext(lpparam.classLoader)
     }
 
@@ -180,7 +183,7 @@ abstract class Hooker : iHooker {
 
     open val rule = ArrayList<Clazz>()
 
-    fun autoAdaption(
+    private fun autoAdaption(
         context: Application,
         classLoader: ClassLoader,
     ): Boolean {
