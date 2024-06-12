@@ -742,6 +742,17 @@ void DbManager::removeBookName(const std::string& name){
     sqlite3_finalize(stmt);
 }
 
+void DbManager::removeBookAll() {
+    char *zErrMsg = nullptr;
+    sqlite3_exec(db,
+                 "DELETE FROM bookName;",
+                 nullptr, nullptr, &zErrMsg);
+    if (zErrMsg) {
+        fprintf(stderr, "SQL error 9: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+}
+
 Json::Value DbManager::getBookName(const std::string& name){
     Json::Value bookName;
     sqlite3_stmt *stmt = getStmt("SELECT * FROM bookName WHERE name = ?;");

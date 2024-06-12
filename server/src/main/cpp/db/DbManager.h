@@ -80,6 +80,7 @@ public:
     Json::Value getBookName(const std::string& name);
     Json::Value getBookName();
     void removeBookName(const std::string& name);
+    void removeBookAll();
 
     //分类
     void insertCate(const std::string& id, const std::string& name, const std::string& icon, const std::string& remoteId,const std::string& parent,const std::string& book,int sort,int type);

@@ -259,6 +259,8 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         } else if(message_type == "book/remove"){
             std::string name = data["name"].asString();
             DbManager::getInstance().removeBookName(name);
+        } else if(message_type == "book/remove/all"){
+            DbManager::getInstance().removeBookAll();
         }
 
         else if(message_type == "book/sync"){
