@@ -86,7 +86,6 @@ abstract class Hooker : iHooker {
                 },
             )
         }.onFailure {
-            XposedBridge.log("测试2")
             runCatching {
                 XposedHelpers.findAndHookMethod(
                     applicationClazz,
