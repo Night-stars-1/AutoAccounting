@@ -40,16 +40,24 @@ android {
             abiFilters 'arm64-v8a', 'x86_64'
         }
     }
+    signingConfigs {
+        release {
+            keyAlias 'night_star'
+            keyPassword '123456'
+            storeFile file('auto.jks')
+            storePassword '123456'
+        }
+    }
     buildFeatures {
         viewBinding true
         buildConfig true
     }
     buildTypes {
         release {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             applicationVariants.all { variant ->
                 variant.outputs.all {
                     outputFileName = "app.apk"
@@ -123,6 +131,29 @@ task extractArraysToTxt {
 // 确保在构建 APK 之前运行此任务
 preBuild.dependsOn extractArraysToTxt
 
+task genDict {
+    doLast {
+        def filePath = new File(projectDir, "dictionary.txt")
+        def charSet = ['0', 'o', 'O'] // Character set definition
+        def maxLength = 10 // Maximum string length definition
+
+        filePath.withWriter { writer ->
+            (1..maxLength).each { length ->
+                generateStrings(charSet, length, '', writer)
+            }
+        }
+    }
+}
+def generateStrings(charSet, maxLength, currentString, writer) {
+    if (maxLength == 0) {
+        writer.write("${currentString}\n")
+    } else {
+        charSet.each {
+            generateStrings(charSet, maxLength - 1, currentString + it, writer)
+        }
+    }
+}
+preBuild.dependsOn genDict
 
 // 构建apk之前，先构建server模块
 preBuild.dependsOn(":server:assembleRelease")

@@ -18,6 +18,7 @@
 class WebSocketServer {
 public:
     explicit WebSocketServer(int port);
+    ~WebSocketServer();
 private:
     //client map
     static std::map<ws_cli_conn_t *, bool> clients;
@@ -28,6 +29,7 @@ private:
     static std::string generateRandomString(int count = 8);
     //初始化token
     static void initToken();
+    static void setupLogger();
     static void publishToken();
     static std::string runJs(const std::string &js);
     static std::string token;

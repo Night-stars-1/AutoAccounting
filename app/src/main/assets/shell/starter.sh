@@ -83,7 +83,7 @@ if [ -f "$OLD_PATH" ]; then
     "$NEW_PATH" "$DIR"  #自动记账的工作路径就是自动记账的缓存路径
   else
     info "启动自动记账服务"
-    "$NEW_PATH" "$DIR" > "$SHELL_PATH/daemon.log" 2>&1 & #自动记账的工作路径就是自动记账的缓存路径
+    "$NEW_PATH" "$DIR" > "$SHELL_PATH/daemon.log" & #自动记账的工作路径就是自动记账的缓存路径
   fi
   info "等待 $SERVER_NAME 服务启动... "
   while [ $retries -lt 120 ]; do

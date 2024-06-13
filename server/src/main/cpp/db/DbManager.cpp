@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include "DbManager.h"
+#include "spdlog/spdlog.h"
 
 DbManager::DbManager() {
     int rc = sqlite3_open_v2("auto.db", &db,
@@ -11,7 +12,7 @@ DbManager::DbManager() {
                              nullptr);
 
     if (rc) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        spdlog::error("Can't open database: {}", sqlite3_errmsg(db));
         sqlite3_close(db);
     } else {
         initTable();
@@ -148,7 +149,7 @@ void DbManager::initTable() {
         char *zErrMsg = nullptr;
         int rc = sqlite3_exec(db, sql, nullptr, nullptr, &zErrMsg);
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "SQL error 0: %s, sql: %s\n", zErrMsg, sql);
+            spdlog::error("SQL error 0: %s, sql: {}", zErrMsg, sql);
             sqlite3_free(zErrMsg);
         }
     }
@@ -158,7 +159,7 @@ sqlite3_stmt *DbManager::getStmt(const std::string &sql) {
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "SQL error 6: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 6: {}", sqlite3_errmsg(db));
         return nullptr;
     }
     return stmt;
@@ -182,7 +183,7 @@ void DbManager::insertLog(const std::string &date, const std::string &app, int h
     sqlite3_bind_int(stmt, 7, level);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 2: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 2: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     //只保留最近5000条日志
@@ -190,7 +191,7 @@ void DbManager::insertLog(const std::string &date, const std::string &app, int h
                  "DELETE FROM log WHERE id NOT IN (SELECT id FROM log ORDER BY id DESC LIMIT 5000);",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 
@@ -214,7 +215,7 @@ Json::Value DbManager::getLog(int limit) {
         ret.append(log);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -225,7 +226,7 @@ void DbManager::deleteAllLog(){
                  "DELETE FROM log;",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
@@ -238,7 +239,7 @@ DbManager::setSetting(const std::string &app, const std::string &key, const std:
     sqlite3_bind_text(stmt, 3, value.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 4: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 4: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -253,7 +254,7 @@ std::string DbManager::getSetting(const std::string &app, const std::string &key
     if (rc == SQLITE_ROW) {
         ret = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
     } else if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 7: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 7: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -304,7 +305,7 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
 
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 
@@ -316,7 +317,7 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
                  "DELETE FROM billInfo WHERE id NOT IN (SELECT id FROM billInfo ORDER BY timeStamp DESC LIMIT 1000);",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
     */
@@ -326,7 +327,7 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
                  "DELETE FROM billInfo WHERE syncFromApp=1 AND id NOT IN (SELECT id FROM billInfo WHERE syncFromApp=1 ORDER BY timeStamp DESC LIMIT 1000);",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 
@@ -335,7 +336,7 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
                  "DELETE FROM billInfo WHERE groupId!=0 AND groupId NOT IN (SELECT id FROM billInfo WHERE groupId=0);",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 
@@ -377,7 +378,7 @@ Json::Value DbManager::getWaitSyncBills() {
         ret.append(bill);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -389,7 +390,7 @@ void DbManager::updateBillSyncStatus(int id, int status) {
     sqlite3_bind_int(stmt, 2, id);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -409,7 +410,7 @@ Json::Value DbManager::getBillListGroup(int limit) {
         ret.append(bill);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -423,7 +424,7 @@ Json::Value DbManager::getBillByIds(const std::string& ids) {
         ret.append(buildBill(stmt));
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -437,7 +438,7 @@ Json::Value DbManager::getBillAllParents() {
         ret.append(buildBill(stmt));
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -452,7 +453,7 @@ Json::Value DbManager::getBillByGroupId(int groupId) {
         ret.append(buildBill(stmt));
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -506,7 +507,7 @@ int DbManager::insertAppData(int id, const std::string &data, int type, const st
     sqlite3_bind_text(stmt, count + 8, rule.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     if (id == 0) {
@@ -534,7 +535,7 @@ Json::Value DbManager::getAppData(int limit) {
         ret.append(appData);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -546,7 +547,7 @@ void DbManager::deleteAllAppData(){
                  "DELETE FROM appData;",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
@@ -556,7 +557,7 @@ void DbManager::deleteAppData(int id) {
     sqlite3_bind_int(stmt, 1, id);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 3: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 3: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -576,7 +577,7 @@ void DbManager::insertAsset(const std::string &id, const std::string &name, int 
     sqlite3_bind_text(stmt, count + 6, extra.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -597,7 +598,7 @@ Json::Value DbManager::getAsset(int limit) {
         ret.append(asset);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -617,7 +618,7 @@ Json::Value DbManager::getAssetByName(const std::string &name) {
         asset["extras"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return asset;
@@ -628,7 +629,7 @@ void DbManager::removeAsset(std::string &name) {
     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -639,7 +640,7 @@ void DbManager::removeAssetAll() {
                  "DELETE FROM assets;",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
@@ -663,7 +664,7 @@ void DbManager::insertAssetMap(int id, const std::string &name, const std::strin
     sqlite3_bind_int(stmt, count + 4, regex);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -681,7 +682,7 @@ Json::Value DbManager::getAssetMap() {
         ret.append(assetMap);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -692,7 +693,7 @@ void DbManager::removeAssetMap(const std::string &id) {
     sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -709,7 +710,7 @@ void DbManager::insertBookName(const std::string &id, const std::string &name, c
     sqlite3_bind_text(stmt, count + 3, icon.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -726,7 +727,7 @@ Json::Value DbManager::getBookName() {
         ret.append(bookName);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -737,7 +738,7 @@ void DbManager::removeBookName(const std::string& name){
     sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -748,7 +749,7 @@ void DbManager::removeBookAll() {
                  "DELETE FROM bookName;",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 9: %s\n", zErrMsg);
+        spdlog::error("SQL error 9: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
@@ -764,7 +765,7 @@ Json::Value DbManager::getBookName(const std::string& name){
         bookName["icon"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return bookName;
@@ -782,7 +783,7 @@ Json::Value DbManager::getOneBookName() {
         ret.append(bookName);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -806,7 +807,7 @@ void DbManager::insertCate(const std::string &id, const std::string &name, const
     sqlite3_bind_int(stmt, count + 8, type);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -833,7 +834,7 @@ Json::Value DbManager::getAllCate(const std::string &parent, const std::string &
         ret.append(cate);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -859,7 +860,7 @@ Json::Value DbManager::getBookAllCate(const std::string &book) {
         ret.append(cate);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -884,7 +885,7 @@ Json::Value DbManager::getCate(const std::string &book, const std::string &cateN
         cate["type"] = sqlite3_column_int(stmt, 7);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return cate;
@@ -908,7 +909,7 @@ Json::Value DbManager::getCateByRemote(const std::string &book, const std::strin
         ret["type"] = sqlite3_column_int(stmt, 7);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -919,7 +920,7 @@ void DbManager::removeCate(const std::string &id) {
     sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_STATIC);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -930,7 +931,7 @@ void DbManager::removeCateAll() {
                  "DELETE FROM category;",
                  nullptr, nullptr, &zErrMsg);
     if (zErrMsg) {
-        fprintf(stderr, "SQL error 3: %s\n", zErrMsg);
+        spdlog::error("SQL error 3: {}", zErrMsg);
         sqlite3_free(zErrMsg);
     }
 }
@@ -945,7 +946,7 @@ void DbManager::insertRule(const std::string &app, const std::string &js,
     sqlite3_bind_int(stmt, 4, type);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 
@@ -966,7 +967,7 @@ Json::Value DbManager::getRule(const std::string &app, int type) {
         ret.append(rule);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -996,7 +997,7 @@ void DbManager::insertCustomRule(int id, const std::string &js, const std::strin
     sqlite3_bind_int(stmt, count + 7, _auto);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -1018,7 +1019,7 @@ Json::Value DbManager::loadCustomRules(int limit) {
         ret.append(rule);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -1029,7 +1030,7 @@ void DbManager::removeCustomRule(int id) {
     sqlite3_bind_int(stmt, 1, id);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -1051,7 +1052,7 @@ Json::Value DbManager::getCustomRule(int id) {
         ret.append(rule);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -1076,7 +1077,7 @@ std::pair<bool,bool>  DbManager::checkRule(const std::string& app, int  type,con
         sqlite3_bind_int(stmt2, 5, 1);
         int rc2 = sqlite3_step(stmt2);
         if (rc2 != SQLITE_DONE) {
-            fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+            spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
         }
         sqlite3_finalize(stmt2);
     }else{
@@ -1084,7 +1085,7 @@ std::pair<bool,bool>  DbManager::checkRule(const std::string& app, int  type,con
         ret2 = sqlite3_column_int(stmt, 4);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return std::make_pair(ret,ret2);
@@ -1096,7 +1097,7 @@ void DbManager::ruleSetting(int id,int autoAccounting,int enable){
     sqlite3_bind_int(stmt, 2, enable);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -1117,7 +1118,7 @@ Json::Value DbManager::getRule(int limit){
         ret.append(rule);
     }
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 5: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 5: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return ret;
@@ -1128,7 +1129,7 @@ void DbManager::removeRule(int id) {
     sqlite3_bind_int(stmt, 1, id);
     int rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {
-        fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+        spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 }
@@ -1141,7 +1142,7 @@ void DbManager::addBxBills(const Json::Value& billArray){
         sqlite3_stmt *stmt = getStmt("DELETE FROM bookBill;");
         int rc = sqlite3_step(stmt);
         if (rc != SQLITE_DONE) {
-            fprintf(stderr, "SQL error 9: %s\n", sqlite3_errmsg(db));
+            spdlog::error("SQL error 9: {}", sqlite3_errmsg(db));
         }
         sqlite3_finalize(stmt);
         //插入数据
@@ -1170,7 +1171,7 @@ void DbManager::addBxBills(const Json::Value& billArray){
             sqlite3_bind_text(stmt2, 9, accountTo.c_str(), -1, SQLITE_STATIC);
             int rc2 = sqlite3_step(stmt2);
             if (rc2 != SQLITE_DONE) {
-                fprintf(stderr, "SQL error 8: %s\n", sqlite3_errmsg(db));
+                spdlog::error("SQL error 8: {}", sqlite3_errmsg(db));
             }
             sqlite3_finalize(stmt2);
 

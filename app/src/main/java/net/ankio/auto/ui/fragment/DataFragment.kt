@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,7 +49,6 @@ import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
 import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.server.model.AppData
-import net.ankio.auto.utils.server.model.BookName
 
 class DataFragment : BaseFragment() {
     private lateinit var binding: FragmentDataBinding

@@ -1,0 +1,2 @@
+-keep class net.ankio.common.model.* { <fields>; }
+-keep class net.ankio.common.config.* { <fields>; }

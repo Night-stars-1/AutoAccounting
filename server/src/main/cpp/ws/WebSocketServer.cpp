@@ -13,8 +13,12 @@
 #include "../base64/include/base64.hpp"
 #include <random>
 #include <sys/stat.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
 std::string WebSocketServer::version;
 WebSocketServer::WebSocketServer(int port) {
+    setupLogger();
     initToken();
     version = getVersion();
     struct ws_server wsServer{};
@@ -28,6 +32,10 @@ WebSocketServer::WebSocketServer(int port) {
 
     ws_socket(&wsServer);
 }
+WebSocketServer::~WebSocketServer() {
+    spdlog::info("Shutting down WebSocket server.");
+    spdlog::shutdown();
+}
 
 std::string WebSocketServer::getVersion() {
     FILE *file = fopen("version.txt", "r");
@@ -39,6 +47,22 @@ std::string WebSocketServer::getVersion() {
         char buf[1024];
         fgets(buf, 1024, file);
         return buf;
+    }
+}
+
+void WebSocketServer::setupLogger() {
+    try {
+        // 创建一个文件记录器
+        auto logger = spdlog::basic_logger_mt("basic_logger", "debug.log");
+
+        // 设置日志级别
+        logger->set_level(spdlog::level::debug);
+
+        // 设置为默认记录器，可以通过 spdlog::info 等静态方法直接使用
+        spdlog::set_default_logger(logger);
+
+    } catch (const spdlog::spdlog_ex &ex) {
+        printf("Log init failed\n");
     }
 }
 
@@ -80,25 +104,24 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         Json::Value json;
         Json::Reader reader;
         if (!reader.parse((const char *) msg, json)) {
-            printf("json parse error\n");
+            spdlog::info("json parse error\n");
             return;
         }
-        printf("recived: %s\n", json.toStyledString().c_str());
+        spdlog::info("recived: {}", json.toStyledString());
 
         std::string message_id = json["id"].asString();
         std::string message_type = json["type"].asString();
         std::string message_token = json["token"].asString();
 
-        printf("message_type: %s\n", message_type.c_str());
-
+        spdlog::info("message_type: {}", message_type);
 
         Json::Value ret;
         if (message_type == "auth") {
 
 
             if (json["data"].asString() != token) {
-                printf("token error %s\n",json["data"].asString().c_str());
-                printf("token error %s\n",token.c_str());
+                spdlog::info("token error: {}", json["data"].asString());
+                spdlog::info("token error: {}",token);
                 publishToken();
                 ws_close_client(client);
                 return;
@@ -112,7 +135,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         }
 
         if (clients.find(client) == clients.end() && message_token != token) {
-            printf("client not auth\n");
+            spdlog::info("client not auth");
             ws_close_client(client);
             return;
         }
@@ -124,14 +147,14 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
 
         if(message_type == "hi,server"){
             ret["data"] = "hi,client";
-        }else if (message_type == "log/put") {
+        } else if (message_type == "log/put") {
             DbManager::getInstance().insertLog(data["date"].asString(), data["app"].asString(),
                                                data["hook"].asInt(), data["thread"].asString(),
                                                data["line"].asString(), data["log"].asString(),data["level"].asInt());
 
         } else if (message_type == "log/get") {
             ret["data"] = DbManager::getInstance().getLog(data["limit"].asInt());
-        }else if (message_type == "log/delete/all") {
+        } else if (message_type == "log/delete/all") {
             DbManager::getInstance().deleteAllLog();
         }
 
@@ -376,7 +399,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
             Json::Value _json;
             Json::Reader _reader;
             if (!_reader.parse((const char *) result.c_str(), _json)) {
-                printf("json parse error\n");
+                spdlog::info("json parse error");
                 ret["data"] = "json parse error";
             }else{
                 double money = _json["money"].asDouble();
@@ -428,7 +451,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                     std::string categoryResult = runJs(categoryJs);
                     Json::Value categoryJson;
                     if (!_reader.parse(categoryResult, categoryJson)) {
-                        printf("json parse error\n");
+                        spdlog::info("json parse error");
                         ret["data"] = "json parse error";
                     } else {
                         // 兼容措施
@@ -455,10 +478,10 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
                                         base64::to_base64(_json.toStyledString()) +
                                         R"(" --ez "android.intent.extra.NO_ANIMATION" true -f 0x10000000)";
                                 //写日志
-                                log("执行命令" + cmd, LOG_LEVEL_INFO);
+                                spdlog::info("执行命令 {}", cmd);
                                 system(cmd.c_str());
                             } catch (const std::exception &e) {
-                                log("拉起自动记账失败：" + std::string(e.what()), LOG_LEVEL_ERROR);
+                                spdlog::error("拉起自动记账失败：{}", e.what());
                             }
 
                         }
@@ -486,7 +509,7 @@ void WebSocketServer::onMessage(ws_cli_conn_t *client,
         ret["id"] = message_id;
         ws_sendframe_txt(client, ret.toStyledString().c_str());
     } catch (std::exception &e) {
-        log("error: " + std::string(e.what()), LOG_LEVEL_ERROR);
+        spdlog::error("error: " + std::string(e.what()));
     }
 
 
@@ -537,7 +560,7 @@ void WebSocketServer::publishToken() {
             if (std::filesystem::exists(appPath)) {
                 std::string path = appPath + "/token.txt";
                 FILE *appFile = fopen(path.c_str(), "w");
-                printf("write token to %s\n", path.c_str());
+                spdlog::info("write token to {}", path);
                 fprintf(appFile, "%s", token.c_str());
                 fclose(appFile);
                 chmod(path.c_str(), 0777);
@@ -559,7 +582,7 @@ std::string threadIdToString(const std::thread::id& id) {
 
 
 void WebSocketServer::print(qjs::rest<std::string> args) {
-    log(args[0], LOG_LEVEL_DEBUG);
+    spdlog::debug(args[0]);
     std::lock_guard<std::mutex> lock(resultMapMutex);
     resultMap[std::this_thread::get_id()] = args[0];
 }
@@ -574,12 +597,12 @@ void WebSocketServer::log(const std::string &msg,int level ){
     std::string  date = {buffer};
     //获取堆栈信息
     DbManager::getInstance().insertLog(date, "server", 0, "main", "server", msg,level);
-    printf("[ %s ] %s\n", buffer, msg.c_str());
+    spdlog::info("[ {} ] {}", buffer, msg);
 }
 
 
 std::string WebSocketServer::runJs(const std::string &js) {
-    log("执行JS脚本",LOG_LEVEL_INFO);
+    spdlog::info("执行JS脚本");
     // log("脚本内容: " + js,LOG_LEVEL_DEBUG);
     qjs::Runtime runtime;
     qjs::Context context(runtime);
@@ -600,9 +623,9 @@ std::string WebSocketServer::runJs(const std::string &js) {
     }
     catch (qjs::exception &e) {
         auto exc = context.getException();
-        log("JS Error: " + (std::string) exc,LOG_LEVEL_WARN);
+        spdlog::warn("JS Error: " + (std::string) exc);
         if ((bool) exc["stack"])
-            log("JS Error: " + (std::string) exc["stack"],LOG_LEVEL_WARN);
+            spdlog::warn("JS Error: " + (std::string) exc["stack"]);
     }
     return "";
 }

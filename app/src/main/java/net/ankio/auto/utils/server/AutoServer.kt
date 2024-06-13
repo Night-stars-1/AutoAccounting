@@ -15,9 +15,11 @@
 
 package net.ankio.auto.utils.server
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -61,16 +63,29 @@ class AutoServer {
     private var ws: WebSocket? = null
     private val callbacks: HashMap<String, (json: JsonObject) -> Unit> = HashMap()
 
+    private var times = 0
+    suspend fun reconnect() = withContext(Dispatchers.Main){
+        if (times > 15) {
+            Logger.e("重连次数过多")
+            EventBus.post(AutoServiceErrorEvent(AutoServiceException("WebSocket closed")))
+            return@withContext
+        }
+        ws = null
+        withContext(Dispatchers.IO){
+            delay(10L * times)
+            times++
+            withContext(Dispatchers.Main){
+                connect()
+            }
+        }
+    }
     suspend fun sendMsg(
         type: String,
         data: Any?,
     ): Any? =
         suspendCancellableCoroutine { continuation ->
             if (ws == null) {
-                connect()
-            }
-            if (ws == null) {
-                Logger.d("WebSocket未连接")
+                Log.d(this.javaClass.simpleName, "WebSocket未连接")
                 continuation.resume(null)
                 return@suspendCancellableCoroutine
             }
@@ -133,6 +148,7 @@ class AutoServer {
                                 return@runCatching
                             } else if (type == "auth/success") {
                                 Logger.d("服务链接成功")
+                                times = 0
                                 ws = webSocket
                                 EventBus.post(AutoServerConnectedEvent())
                             }
@@ -170,8 +186,10 @@ class AutoServer {
                 ) {
                     ws = null
                     println("WebSocket closed: $code / $reason")
-
-                    EventBus.post(AutoServiceErrorEvent(AutoServiceException("WebSocket closed: $code / $reason")))
+                    AppUtils.getScope().launch {
+                        reconnect()
+                    }
+                    // EventBus.post(AutoServiceErrorEvent(AutoServiceException("WebSocket closed: $code / $reason")))
                 }
 
                 override fun onFailure(
