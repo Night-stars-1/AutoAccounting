@@ -28,7 +28,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.lifecycleScope
-import com.hjq.toast.Toaster
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +42,7 @@ import net.ankio.auto.utils.DateUtils
 import net.ankio.auto.utils.ListPopupUtils
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
+import net.ankio.auto.utils.ToastUtil
 import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.Assets
 import net.ankio.auto.utils.server.model.AssetsMap
@@ -202,7 +202,7 @@ class FloatEditorDialog(
                 runCatching {
                     BillUtils.groupBillInfo(bill, child)
                     if (SpUtils.getBoolean("setting_book_success", true)) {
-                        Toaster.show(
+                        ToastUtil.show(
                             context.getString(
                                 R.string.auto_success,
                                 billInfo.money.toString(),
@@ -261,6 +261,7 @@ class FloatEditorDialog(
                         }
                     }
                 }.onFailure {
+                    Logger.e("AutoServiceException => $it", it)
                     if (it is AutoServiceException) {
                         EventBus.post(AutoServiceErrorEvent(it))
                     }

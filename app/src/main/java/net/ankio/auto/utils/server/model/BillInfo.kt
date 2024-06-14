@@ -17,6 +17,7 @@ package net.ankio.auto.utils.server.model
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
+import com.google.gson.JsonPrimitive
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
 
@@ -151,7 +152,12 @@ class BillInfo {
     companion object {
         suspend fun put(billInfo: BillInfo): Int {
             billInfo.timeStamp = billInfo.timeStamp.toString().substring(0, 10).toLong()
-            return AppUtils.getService().sendMsg("bill/put", billInfo) as Int
+            val data = AppUtils.getService().sendMsg("bill/put", billInfo)
+            return if (data is JsonPrimitive) {
+                data.asInt
+            } else {
+                -1
+            }
         }
 
         suspend fun getBillListGroup(limit: Int = 500): List<Pair<String, String>> {

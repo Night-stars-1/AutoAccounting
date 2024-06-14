@@ -30,4 +30,6 @@ object ToastUtil {
     fun toast(resId: Int) {
         Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show()
     }
+
+    fun show(msg: String) = toast(msg)
 }

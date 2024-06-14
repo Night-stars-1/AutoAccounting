@@ -55,7 +55,7 @@ void DbManager::initTable() {
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "type INTEGER,"
             "currency TEXT,"
-            "money INTEGER,"
+            "money REAL,"
             "fee INTEGER,"
             "timeStamp INTEGER,"
             "shopName TEXT,"
@@ -260,7 +260,7 @@ std::string DbManager::getSetting(const std::string &app, const std::string &key
     return ret;
 }
 
-int DbManager::insertBill(int id, int type, const std::string &currency, int money, int fee, int timeStamp,
+int DbManager::insertBill(int id, int type, const std::string &currency, double money, int fee, int timeStamp,
                            const std::string &shopName, const std::string &cateName,
                            const std::string &extendData, const std::string &bookName, const std::string &bookId,
                            const std::string &accountNameFrom, const std::string &accountNameTo,
@@ -285,7 +285,7 @@ int DbManager::insertBill(int id, int type, const std::string &currency, int mon
 
     sqlite3_bind_int(stmt, count + 2, type);
     sqlite3_bind_text(stmt, count + 3, currency.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, count + 4, money);
+    sqlite3_bind_double(stmt, count + 4, money);
     sqlite3_bind_int(stmt, count + 5, fee);
     sqlite3_bind_int(stmt, count + 6, timeStamp);
     sqlite3_bind_text(stmt, count + 7, shopName.c_str(), -1, SQLITE_STATIC);
@@ -359,7 +359,7 @@ Json::Value DbManager::getWaitSyncBills() {
         bill["id"] = sqlite3_column_int(stmt, 0);
         bill["type"] = sqlite3_column_int(stmt, 1);
         bill["currency"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        bill["money"] = sqlite3_column_int(stmt, 3);
+        bill["money"] = sqlite3_column_double(stmt, 3);
         bill["fee"] = sqlite3_column_int(stmt, 4);
         bill["timeStamp"] = sqlite3_column_int(stmt, 5);
         bill["shopName"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
@@ -464,7 +464,7 @@ Json::Value DbManager::buildBill(sqlite3_stmt *stmt){
     bill["id"] = sqlite3_column_int(stmt, 0);
     bill["type"] = sqlite3_column_int(stmt, 1);
     bill["currency"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-    bill["money"] = sqlite3_column_int(stmt, 3);
+    bill["money"] = sqlite3_column_double(stmt, 3);
     bill["fee"] = sqlite3_column_int(stmt, 4);
     bill["timeStamp"] = sqlite3_column_int(stmt, 5);
     bill["shopName"] = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
