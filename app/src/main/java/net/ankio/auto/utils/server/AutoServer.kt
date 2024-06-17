@@ -175,7 +175,7 @@ class AutoServer {
                     ws = null
                     webSocket.close(1000, null)
 
-                    println("WebSocket closing: $code / $reason")
+                    Log.i("自动记账", "WebSocket closing: $code / $reason")
                 }
 
                 override fun onClosed(
@@ -184,11 +184,11 @@ class AutoServer {
                     reason: String,
                 ) {
                     ws = null
-                    println("WebSocket closed: $code / $reason")
+                    Log.i("自动记账", "WebSocket closed: $code / $reason")
                     AppUtils.getScope().launch {
                         reconnect()
                     }
-                    // EventBus.post(AutoServiceErrorEvent(AutoServiceException("WebSocket closed: $code / $reason")))
+                    EventBus.post(AutoServiceErrorEvent(AutoServiceException("WebSocket closed: $code / $reason")))
                 }
 
                 override fun onFailure(
@@ -197,6 +197,11 @@ class AutoServer {
                     response: Response?,
                 ) {
                     Logger.e("WebSocket error: " + t.message, t)
+                    if (ws != null) {
+                        AppUtils.getScope().launch {
+                            reconnect()
+                        }
+                    }
                     EventBus.post(AutoServiceErrorEvent(AutoServiceException(t.message ?: "WebSocket error")))
                 }
             }
@@ -206,7 +211,11 @@ class AutoServer {
 
     suspend fun config(): AccountingConfig {
         val json = SettingModel.get("server", "config")
-        return runCatching { Gson().fromJson(json, AccountingConfig::class.java) }.getOrDefault(AccountingConfig())
+        return if (json != "") {
+            Gson().fromJson(json, AccountingConfig::class.java)
+        } else {
+            AccountingConfig()
+        }
     }
 
     suspend fun copyAssets() =

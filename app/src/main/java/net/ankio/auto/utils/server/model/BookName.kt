@@ -23,10 +23,7 @@ import kotlinx.coroutines.launch
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
-import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
-import net.ankio.common.config.Config
-import net.ankio.common.model.AccountingConfig
 
 class BookName {
     /**

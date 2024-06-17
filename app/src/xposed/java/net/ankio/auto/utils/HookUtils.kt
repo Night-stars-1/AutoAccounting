@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.widget.Toast
 import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XSharedPreferences
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankio.auto.BuildConfig
 import net.ankio.auto.HookMainApp
+import net.ankio.auto.api.XPrefManager
 import net.ankio.auto.app.js.Engine
 import net.ankio.auto.events.AutoServerConnectedEvent
 import net.ankio.auto.exceptions.AutoServiceException
@@ -46,9 +48,11 @@ class HookUtils(val context: Application, private val packageName: String) {
         )
 
         AppUtils.setApplication(context)
-        AppUtils.getService().connect()
-        EventBus.register(AutoServerConnectedEvent::class.java) {
-            toast("自动记账服务已连接")
+        if (context.packageName != BuildConfig.APPLICATION_ID) {
+            EventBus.register(AutoServerConnectedEvent::class.java) {
+                toast("自动记账服务已连接")
+            }
+            AppUtils.getService().connect()
         }
         XposedBridge.hookAllMethods(
             ClassLoader::class.java,
@@ -87,10 +91,11 @@ class HookUtils(val context: Application, private val packageName: String) {
      */
     suspend fun isDebug(): Boolean =
         withContext(Dispatchers.IO) {
+            XposedBridge.log(XPrefManager.debug.toString())
             if (BuildConfig.DEBUG) {
                 true
             } else {
-                SpUtils.getBoolean("setting_debug", false)
+                XPrefManager.debug
             }
         }
 

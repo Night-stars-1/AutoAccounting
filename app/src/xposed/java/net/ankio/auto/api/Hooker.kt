@@ -32,9 +32,12 @@ package net.ankio.auto.api
  *
  */
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -43,6 +46,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 import kotlinx.coroutines.launch
 import net.ankio.auto.BuildConfig
 import net.ankio.auto.HookMainApp
+import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.HookUtils
 import net.ankio.dex.Dex
 import net.ankio.dex.model.Clazz
@@ -60,6 +64,21 @@ abstract class Hooker : iHooker {
         fun onCachedApplication(application: Application) {
             hookStatus = true
             runCatching {
+                if (application.packageName != BuildConfig.APPLICATION_ID) {
+                    XposedHelpers.findAndHookMethod(
+                        Activity::class.java.name,
+                        classLoader,
+                        "onCreate",
+                        Bundle::class.java,
+                        object : XC_MethodHook() {
+                            override fun afterHookedMethod(param: MethodHookParam) {
+                                XposedBridge.log("[$TAG] onCreate ${AppUtils.getService().isConnected()}")
+                                if (!AppUtils.getService().isConnected())
+                                    AppUtils.getService().connect()
+                            }
+                        },
+                    )
+                }
                 initLoadPackage(application.classLoader, application)
             }.onFailure {
                 XposedBridge.log("自动记账Hook异常..${it.message}.")
@@ -76,7 +95,6 @@ abstract class Hooker : iHooker {
                 Context::class.java,
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
-                        XposedBridge.log("attach")
                         if (hookStatus) {
                             return
                         }

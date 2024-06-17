@@ -15,12 +15,13 @@
 
 package net.ankio.auto.utils
 
+import android.content.Context.MODE_WORLD_READABLE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ankio.auto.utils.server.model.SettingModel
 
 object SpUtils {
-    private val sp = AppUtils.getApplication().getSharedPreferences("setting", 0)
+    private val sp = AppUtils.getApplication().getSharedPreferences("setting", MODE_WORLD_READABLE)
 
     fun putBooleanRemote(
         key: String,
