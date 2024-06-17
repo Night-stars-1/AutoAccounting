@@ -30,7 +30,6 @@ import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.event.EventBus
 import net.ankio.auto.utils.server.model.SettingModel
-import net.ankio.common.config.Config
 import net.ankio.common.model.AccountingConfig
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -207,19 +206,7 @@ class AutoServer {
 
     suspend fun config(): AccountingConfig {
         val json = SettingModel.get("server", "config")
-        var newConfig = runCatching { Gson().fromJson(json, AccountingConfig::class.java) }.getOrNull()
-        if (newConfig == null) {
-            newConfig = AccountingConfig()
-        }
-        Config.apply {
-            assetManagement = newConfig.assetManagement
-            multiCurrency = newConfig.multiCurrency
-            reimbursement = newConfig.reimbursement
-            lending = newConfig.lending
-            multiBooks = newConfig.multiBooks
-            fee = newConfig.fee
-        }
-        return newConfig
+        return runCatching { Gson().fromJson(json, AccountingConfig::class.java) }.getOrDefault(AccountingConfig())
     }
 
     suspend fun copyAssets() =

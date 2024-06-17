@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import net.ankio.auto.R
 import net.ankio.auto.utils.AppUtils
 import net.ankio.auto.utils.ImageUtils
+import net.ankio.auto.utils.Logger
 import net.ankio.auto.utils.SpUtils
 import net.ankio.common.config.Config
 import net.ankio.common.model.AccountingConfig
@@ -78,7 +79,7 @@ class BookName {
         }
 
         suspend fun getDefaultBook(bookName: String): BookName {
-            val localBookName = if (Config.multiBooks) {
+            val localBookName = if (AppUtils.getService().config().multiBooks) {
                 SpUtils.getString("defaultBook", "默认账本")
             } else {
                 bookName
