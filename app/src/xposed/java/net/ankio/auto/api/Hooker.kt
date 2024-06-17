@@ -76,6 +76,7 @@ abstract class Hooker : iHooker {
                 Context::class.java,
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam) {
+                        XposedBridge.log("attach")
                         if (hookStatus) {
                             return
                         }
