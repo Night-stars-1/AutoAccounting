@@ -49,7 +49,6 @@ object Engine {
                     "analyze",
                     Data(dataType, app, data, if (call) 1 else 0, id),
                 )
-            XposedBridge.log(json.toString())
             val billInfo = runCatching { Gson().fromJson(json as JsonObject, BillInfo::class.java) }.getOrNull()
 
             AppTimeMonitor.stopMonitoring("规则识别")
