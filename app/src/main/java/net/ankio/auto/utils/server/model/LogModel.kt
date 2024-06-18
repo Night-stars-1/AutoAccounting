@@ -45,7 +45,7 @@ class LogModel {
         suspend fun get(limit: Int = 500): List<LogModel> {
             val data = AppUtils.getService().sendMsg("log/get", mapOf("limit" to limit))
             return if (data !is JsonNull && data != null) {
-                Gson().fromJson(Gson().toJson(data), Array<LogModel>::class.java).toList()
+                Gson().fromJson(Gson().toJson(data), Array<LogModel>::class.java).toList().reversed()
             } else {
                 emptyList()
             }
