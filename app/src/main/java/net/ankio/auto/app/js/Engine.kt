@@ -17,6 +17,7 @@ package net.ankio.auto.app.js
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import de.robv.android.xposed.XposedBridge
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ankio.auto.utils.AppTimeMonitor
@@ -48,7 +49,7 @@ object Engine {
                     "analyze",
                     Data(dataType, app, data, if (call) 1 else 0, id),
                 )
-
+            XposedBridge.log(json.toString())
             val billInfo = runCatching { Gson().fromJson(json as JsonObject, BillInfo::class.java) }.getOrNull()
 
             AppTimeMonitor.stopMonitoring("规则识别")

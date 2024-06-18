@@ -51,12 +51,17 @@ class FloatingWindowTriggerActivity : AppCompatActivity() {
                     putExtra("data", dataValue)
                 }
             val server = AppUtils.getService()
-            if (!server.isConnected())
-                server.connect()
-            EventBus.register(AutoServerConnectedEvent::class.java) {
+            if (server.isConnected()) {
                 startService(serviceIntent)
                 // 关闭 Activity
                 exitActivity()
+            } else {
+                EventBus.register(AutoServerConnectedEvent::class.java) {
+                    startService(serviceIntent)
+                    // 关闭 Activity
+                    exitActivity()
+                }
+                server.connect()
             }
         }.onFailure {
             Logger.e("解析数据失败", it)

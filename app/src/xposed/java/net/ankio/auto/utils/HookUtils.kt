@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankio.auto.BuildConfig
 import net.ankio.auto.HookMainApp
-import net.ankio.auto.api.XPrefManager
 import net.ankio.auto.app.js.Engine
 import net.ankio.auto.events.AutoServerConnectedEvent
 import net.ankio.auto.exceptions.AutoServiceException
@@ -91,11 +90,10 @@ class HookUtils(val context: Application, private val packageName: String) {
      */
     suspend fun isDebug(): Boolean =
         withContext(Dispatchers.IO) {
-            XposedBridge.log(XPrefManager.debug.toString())
             if (BuildConfig.DEBUG) {
                 true
             } else {
-                XPrefManager.debug
+                XSharedPreferences(BuildConfig.APPLICATION_ID, "setting").getBoolean("setting_debug", false)
             }
         }
 

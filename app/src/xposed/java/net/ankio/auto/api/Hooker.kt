@@ -72,7 +72,6 @@ abstract class Hooker : iHooker {
                         Bundle::class.java,
                         object : XC_MethodHook() {
                             override fun afterHookedMethod(param: MethodHookParam) {
-                                XposedBridge.log("[$TAG] onCreate ${AppUtils.getService().isConnected()}")
                                 if (!AppUtils.getService().isConnected())
                                     AppUtils.getService().connect()
                             }
